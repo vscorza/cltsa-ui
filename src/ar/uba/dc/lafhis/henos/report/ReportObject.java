@@ -19,9 +19,9 @@ public abstract class ReportObject {
 	protected static List<Character> arrayFinalizers	= null;
 	
 	static {
-		sepChar			= new Character(ReportConstants.AUT_SER_SEP);
-		arrayEndChar	= new Character(ReportConstants.AUT_SER_ARRAY_END);
-		objEndChar		= new Character(ReportConstants.AUT_SER_OBJ_END);
+		sepChar			= ReportConstants.AUT_SER_SEP;
+		arrayEndChar	= ReportConstants.AUT_SER_ARRAY_END;
+		objEndChar		= ReportConstants.AUT_SER_OBJ_END;
 		arrayFinalizers	= new ArrayList<Character>();
 		arrayFinalizers.add(sepChar); arrayFinalizers.add(arrayEndChar);
 	}
@@ -39,10 +39,10 @@ public abstract class ReportObject {
 			char current;
 			while (fis.available() > 0) {
 				current = (char) fis.read();
-				if(!finalizers.contains(new Character(current))) {
+				if(!finalizers.contains(current)) {
 					value += current;
 				}else {
-					lastFinalizer	= new Character(current);
+					lastFinalizer	= current;
 					break;
 				}
 			}
@@ -66,10 +66,10 @@ public abstract class ReportObject {
 			char current;
 			while (fis.available() > 0) {
 				current = (char) fis.read();
-				if(!finalizers.contains(new Character(current))) {
+				if(!finalizers.contains(current)) {
 					value += current;
 				}else {
-					lastFinalizer	= new Character(current);
+					lastFinalizer	= current;
 					break;
 				}
 			}
@@ -93,10 +93,10 @@ public abstract class ReportObject {
 			char current;
 			while (fis.available() > 0) {
 				current = (char) fis.read();
-				if(!finalizers.contains(new Character(current))) {
+				if(!finalizers.contains(current)) {
 					value += current;
 				}else {
-					lastFinalizer	= new Character(current);
+					lastFinalizer	= current;
 					break;
 				}
 			}
@@ -131,10 +131,10 @@ public abstract class ReportObject {
 			char current;
 			if (fis.available() > 0) {
 				current = (char) fis.read();
-				if(!finalizers.contains(new Character(current))) {
+				if(!finalizers.contains(current)) {
 					isOK	= false;
 				}else {
-					lastFinalizer	= new Character(current);
+					lastFinalizer	= current;
 				}
 			}
 		} catch (IOException e) {
@@ -143,4 +143,36 @@ public abstract class ReportObject {
 		}		
 		return values;
 	}
+	protected List<String> readStringArray(FileInputStream fis, Character finalizer){
+		List<Character> chars	= new ArrayList<Character>();
+		chars.add(finalizer);
+		return readStringArray(fis, chars);
+	}	
+	protected List<String> readStringArray(FileInputStream fis, List<Character> finalizers){
+		List<String> values	= new ArrayList<String>();
+		lastFinalizer			= null;
+		isOK					= true;
+		String currentString;
+		do {
+			currentString	= readString(fis, arrayFinalizers);
+			if(!isOK)
+				break;
+			values.add(currentString);
+		}while(lastFinalizer != null && !(lastFinalizer.charValue() == (ReportConstants.AUT_SER_ARRAY_END)));
+	    try {
+			char current;
+			if (fis.available() > 0) {
+				current = (char) fis.read();
+				if(!finalizers.contains(current)) {
+					isOK	= false;
+				}else {
+					lastFinalizer	= current;
+				}
+			}
+		} catch (IOException e) {
+			isOK = false;
+			e.printStackTrace();
+		}		
+		return values;
+	}	
 }

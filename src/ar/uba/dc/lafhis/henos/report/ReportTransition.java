@@ -27,7 +27,7 @@ public class ReportTransition extends ReportObject{
 			toState			= readInt(fis, sepChar);
 			int sigCount	= readInt(fis, sepChar);
 			labels			= readIntArray(fis, sepChar);
-			isInput			= readBoolean(fis, objEndChar);
+			isInput			= readBoolean(fis, objEndChar);			
 	      } catch (IOException e) {
 	    	  isOK = false;
 	    	  e.printStackTrace();
