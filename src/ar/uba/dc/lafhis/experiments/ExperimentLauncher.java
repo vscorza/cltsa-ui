@@ -17,6 +17,7 @@ import ar.uba.dc.lafhis.experiments.exchange.JSONCompatibleObject;
 import ar.uba.dc.lafhis.experiments.exchange.JSONCompatibleString;
 import ar.uba.dc.lafhis.experiments.jung.ExperimentJUNGGameEdgeValue;
 import ar.uba.dc.lafhis.experiments.jung.ExperimentJUNGGameNodeValue;
+import ar.uba.dc.lafhis.experiments.jung.ExperimentJUNGHelper;
 import ar.uba.dc.lafhis.experiments.visualization.ExperimentJUNGGraphVisualization;
 import ar.uba.dc.lafhis.henos.report.ReportAutomaton;
 import edu.uci.ics.jung.graph.DirectedGraph;
@@ -28,6 +29,19 @@ public class ExperimentLauncher {
 		InputStream is				= new ByteArrayInputStream(serializedAutomaton.getBytes(StandardCharsets.UTF_8));
 		ReportAutomaton automaton	= new ReportAutomaton(new PushbackInputStream(is));
 		System.out.println(automaton.toString());
+		JFrame frame = new JFrame("Simple Graph View");
+		 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		 JSONCompatibleObject jsonGraph = new JSONCompatibleObject(ExperimentJUNGHelper.getInstance().getReportAutomatonGraph(automaton));
+		 try {
+			//size of the screen
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			frame.getContentPane().add((new ExperimentJUNGGraphVisualization(jsonGraph, new Dimension(screenSize.width - 200, screenSize.height - 200))).getVisualComponent());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 frame.pack();
+		 frame.setVisible(true); 
 				
 		/*
 		GamePrunningExperiment firstExperiment = new GamePrunningExperiment("Aug.Bisc.");

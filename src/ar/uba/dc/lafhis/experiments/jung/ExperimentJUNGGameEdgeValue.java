@@ -47,7 +47,7 @@ public class ExperimentJUNGGameEdgeValue<ID, S, L> implements JSONAware{
 	
 	@Override
 	public String toString() {
-		String value = id.toString() +(isControllable? "!":"?") + "<";
+		String value = "<";
 		boolean firstValue = true;
 		for(L l : labels) {
 			if(firstValue) {
@@ -57,7 +57,7 @@ public class ExperimentJUNGGameEdgeValue<ID, S, L> implements JSONAware{
 			}
 			value += l.toString();
 		}
-		value += ">";
+		value += ">"+(isControllable? "!":"?");
 		return value;
 	}
 

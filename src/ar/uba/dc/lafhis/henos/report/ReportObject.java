@@ -111,7 +111,84 @@ public abstract class ReportObject {
 	    isOK	= false;
 	    return false;
 	} 
-	
+	protected List<Boolean> readBooleanArray(PushbackInputStream fis, Character finalizer){
+		List<Character> chars	= new ArrayList<Character>();
+		chars.add(finalizer);
+		return readBooleanArray(fis, chars);
+	}	
+	protected List<Boolean> readBooleanArray(PushbackInputStream fis, List<Character> finalizers){
+		List<Boolean> values	= new ArrayList<Boolean>();
+		lastFinalizer			= null;
+		isOK					= true;
+		int currentInt;
+	    try {
+			char current 	= (char) fis.read();
+			if(current != ReportConstants.AUT_SER_ARRAY_START) {
+				isOK	= false;
+				return values;
+			}	
+			do {
+				current		= (char)fis.read();
+				if(current == ReportConstants.AUT_SER_ARRAY_END) {
+					break;
+				}	
+				fis.unread(current);
+				currentInt	= readInt(fis, arrayFinalizers);
+				if(!isOK)
+					break;
+				values.add(currentInt == 1);
+			}while(lastFinalizer != null && !(lastFinalizer.charValue() == (ReportConstants.AUT_SER_ARRAY_END)));
+
+			if (fis.available() > 0) {
+				current = (char) fis.read();
+				if(!finalizers.contains(current)) {
+					isOK	= false;
+				}else {
+					lastFinalizer	= current;
+				}
+			}
+		} catch (IOException e) {
+			isOK = false;
+			e.printStackTrace();
+		}		
+		return values;
+	}	
+	protected List<List<Boolean>> readBooleanArrayArray(PushbackInputStream fis, Character finalizer){
+		List<Character> chars	= new ArrayList<Character>();
+		chars.add(finalizer);
+		return readBooleanArrayArray(fis, chars);
+	}	
+	protected List<List<Boolean>> readBooleanArrayArray(PushbackInputStream fis, List<Character> finalizers){
+		List<List<Boolean>> values	= new ArrayList<List<Boolean>>();
+		lastFinalizer			= null;
+		isOK					= true;
+	    try {
+			char current 	= (char) fis.read();
+			if(current != ReportConstants.AUT_SER_ARRAY_START) {
+				isOK	= false;
+				return values;
+			}			
+			do {
+				current		= (char)fis.read();
+				if(current == ReportConstants.AUT_SER_ARRAY_START) {
+					fis.unread(current);
+					values.add(readBooleanArray(fis, arrayFinalizers));
+				}
+			}while((lastFinalizer.charValue() != (ReportConstants.AUT_SER_ARRAY_END)));
+			if (fis.available() > 0) {
+				current = (char) fis.read();
+				if(!finalizers.contains(current)) {
+					isOK	= false;
+				}else {
+					lastFinalizer	= current;
+				}
+			}
+		} catch (IOException e) {
+			isOK = false;
+			e.printStackTrace();
+		}		
+		return values;
+	}		
 	protected List<Integer> readIntArray(PushbackInputStream fis, Character finalizer){
 		List<Character> chars	= new ArrayList<Character>();
 		chars.add(finalizer);
@@ -163,7 +240,6 @@ public abstract class ReportObject {
 		List<List<Integer>> values	= new ArrayList<List<Integer>>();
 		lastFinalizer			= null;
 		isOK					= true;
-		int currentInt;
 	    try {
 			char current 	= (char) fis.read();
 			if(current != ReportConstants.AUT_SER_ARRAY_START) {
