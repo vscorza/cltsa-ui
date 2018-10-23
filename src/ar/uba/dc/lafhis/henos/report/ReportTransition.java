@@ -2,6 +2,7 @@ package ar.uba.dc.lafhis.henos.report;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.PushbackInputStream;
 import java.util.List;
 
 public class ReportTransition extends ReportObject{
@@ -15,7 +16,7 @@ public class ReportTransition extends ReportObject{
 	public boolean getIsInput() {return isInput;}
 	public List<Integer> getLabels() {return labels;}
 	//<from,to,sig_count,[s_1.idx,..,s_N.idx],is_input>
-	public ReportTransition(FileInputStream fis) {
+	public ReportTransition(PushbackInputStream fis) {
 	    try {
 			char current;
 			current = (char) fis.read();

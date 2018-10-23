@@ -2,6 +2,7 @@ package ar.uba.dc.lafhis.henos.report;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.PushbackInputStream;
 import java.util.List;
 //
 public class ReportFluent extends ReportObject{
@@ -15,7 +16,7 @@ public class ReportFluent extends ReportObject{
 	public List<Integer> getEndingSignals() {return endingSignals;}
 	public boolean getInitialValue() {return initially;}
 	//<name,starting_count,[f_1,..,f_n],ending_count,[f'_1,..,f'_m],initially>
-	public ReportFluent(FileInputStream fis) {
+	public ReportFluent(PushbackInputStream fis) {
 	    try {
 			char current;
 			current = (char) fis.read();

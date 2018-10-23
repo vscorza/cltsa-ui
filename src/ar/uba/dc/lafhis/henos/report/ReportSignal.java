@@ -2,6 +2,7 @@ package ar.uba.dc.lafhis.henos.report;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.PushbackInputStream;
 
 public class ReportSignal extends ReportObject{
 	protected String name;
@@ -10,7 +11,7 @@ public class ReportSignal extends ReportObject{
 	public String getName() {return name; }
 	public ReportSignalType getType() {return type;}
 	//<name,type>
-	public ReportSignal(FileInputStream fis) {
+	public ReportSignal(PushbackInputStream fis) {
 	    try {
 			char current;
 			current = (char) fis.read();

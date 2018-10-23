@@ -2,6 +2,10 @@ package ar.uba.dc.lafhis.experiments;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.PushbackInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -11,15 +15,21 @@ import ar.uba.dc.lafhis.experiments.exchange.JSONCompatible;
 import ar.uba.dc.lafhis.experiments.exchange.JSONCompatibleBoolean;
 import ar.uba.dc.lafhis.experiments.exchange.JSONCompatibleObject;
 import ar.uba.dc.lafhis.experiments.exchange.JSONCompatibleString;
-import ar.uba.dc.lafhis.experiments.gamePrunning.GamePrunningExperiment;
 import ar.uba.dc.lafhis.experiments.jung.ExperimentJUNGGameEdgeValue;
 import ar.uba.dc.lafhis.experiments.jung.ExperimentJUNGGameNodeValue;
 import ar.uba.dc.lafhis.experiments.visualization.ExperimentJUNGGraphVisualization;
+import ar.uba.dc.lafhis.henos.report.ReportAutomaton;
 import edu.uci.ics.jung.graph.DirectedGraph;
 
 public class ExperimentLauncher {
 
 	public static void main(String[] args) {
+		String serializedAutomaton	= "<automaton,<CTX,<4,[<x1.off,0>,<x1.on,0>,<y1.off,1>,<y1.on,1>]>,1,[test fluent],2,[ass_1,goal_1]>,4,[0,1,2,3],2,[<0,1,2,[1,3],1>,<0,0,0,[],0>],1,[0],[[0],[0]],[[0,0],[0,1]]>";
+		InputStream is				= new ByteArrayInputStream(serializedAutomaton.getBytes(StandardCharsets.UTF_8));
+		ReportAutomaton automaton	= new ReportAutomaton(new PushbackInputStream(is));
+		System.out.println(automaton.toString());
+				
+		/*
 		GamePrunningExperiment firstExperiment = new GamePrunningExperiment("Aug.Bisc.");
 		
 		Dictionary<String, JSONCompatible> parameters = new Hashtable<String, JSONCompatible>();
@@ -56,6 +66,7 @@ public class ExperimentLauncher {
 		}
 		 frame.pack();
 		 frame.setVisible(true); 
+		 */
 	}
 
 }

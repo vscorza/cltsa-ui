@@ -6,14 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ac.ic.doc.commons.relations.BinaryRelation;
-import ac.ic.doc.commons.relations.Pair;
-import ac.ic.doc.mtstools.model.LTS;
 import ar.uba.dc.lafhis.experiments.exchange.JSONAwareMultiGraph;
-import controller.game.model.Game;
-import controller.game.model.LabelledGame;
-import controller.game.model.LabelledGameSolver;
-import controller.model.gr.GRGoal;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
@@ -27,7 +20,7 @@ public class ExperimentJUNGHelper {
 			instance = new ExperimentJUNGHelper();
 		return instance;
 	}
-	
+	/*
 	public JSONAwareMultiGraph<ExperimentJUNGGameNodeValue<Long>, ExperimentJUNGGameEdgeValue<String,Long>> getLTSGraph(LTS<Long, String> lts
 			, Set<String> controllableActions){
 		
@@ -120,4 +113,5 @@ public class ExperimentJUNGHelper {
 		}
 		return returnGraph;
 	}
+	*/
 }
