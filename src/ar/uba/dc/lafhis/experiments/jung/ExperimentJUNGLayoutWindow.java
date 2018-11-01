@@ -5,6 +5,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileFilter;
 
 import ar.uba.dc.lafhis.experiments.jung.ExperimentJUNGCanvas.EnumLayout;
 import ar.uba.dc.lafhis.experiments.jung.ExperimentJUNGCanvas.EnumMode;
@@ -16,9 +17,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PushbackInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -58,15 +64,18 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
     Font f3 = new Font("SansSerif", Font.PLAIN, 12);
     Font f4 = new Font("SansSerif", Font.BOLD, 16);
 
+    JTextPane infoText;
+    
     ImageIcon drawIcon;
 
-    public ExperimentJUNGLayoutWindow(ReportAutomaton automaton) {
+    public ExperimentJUNGLayoutWindow() {
 
         super();
         drawIcon = getDrawIcon();
 
         output = new ExperimentJUNGCanvas();
 
+        Container frame	= this.getParent();
         JScrollPane left;
         //scrollable list pane
         list = new JList();
@@ -78,6 +87,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         JPanel canvasTools = new JPanel(new BorderLayout());
         canvasTools.add("Center", output);
+        
 
         ArrayList<EnumLayout> layoutTypes = new ArrayList<EnumLayout>();
         for (EnumLayout l : EnumLayout.values()) {
@@ -195,16 +205,62 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 
         layoutControls.setFloatable(false);
         canvasTools.add("North", layoutControls);
+        
+        infoText			= new JTextPane();
+        infoText.setContentType("text/html");
+        infoText.setText("<html><b>[Status pending]</b></html>");
+        canvasTools.add("South", infoText);
+        
+        JPanel leftPanel	= new JPanel(new BorderLayout());
+        JButton fileButton	= new JButton("Open File");
+        fileButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				JFileChooser chooser = new JFileChooser();
+				chooser.setCurrentDirectory(new File("../henos-automata/src/results"));
+				chooser.setMultiSelectionEnabled(true);
+				chooser.setFileFilter(new FileFilter() {
+					public boolean accept(File f) {
+						return f.getName().toLowerCase().endsWith(".rep")
+						|| f.isDirectory();
+					}
+					
+					public String getDescription() {
+					return "REP Files";
+					}
+				});
+				int r = chooser.showOpenDialog(frame);
+				if (r == JFileChooser.APPROVE_OPTION) {
+					try {
+						int fileCount	= chooser.getSelectedFiles().length;
+						sm				= new ReportAutomaton[fileCount];
+						fileCount		= 0;
+						for(File f: chooser.getSelectedFiles()) {
+							String filename = chooser.getSelectedFile().getPath();
+							FileInputStream is;
+								is = new FileInputStream(f);
+							
+							sm[fileCount++]	= new ReportAutomaton(new PushbackInputStream(is));
+						}
+					} catch (FileNotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}					
+			        new_machines();
+				}
+			}
 
-        setLeftComponent(left);
+		});
+        leftPanel.add("North", fileButton);
+        leftPanel.add("Center", left);
+        
+        setLeftComponent(leftPanel);
         setRightComponent(canvasTools);
         setDividerLocation(200);
         setBigFont(fontFlag);
         validate();
-
-        sm		= new ReportAutomaton[1];
-        sm[0]	= automaton;
-        new_machines(automaton);
 
     }
 
@@ -253,6 +309,8 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
             int machine = list.getSelectedIndex();
             if (machine < 0 || machine >= Nmach) return;
 
+            infoText.setText(sm[machine].getAutomatonInfo());
+            
             if (singleMode) {
                 if (stateLimit > 0 && sm[machine].getTransitions().size() > stateLimit) {
                     int o = JOptionPane.showConfirmDialog(getParent(),
@@ -432,27 +490,17 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
      * Renew the members with a CompositeState
      */
     @SuppressWarnings("unchecked")
-    private void new_machines(ReportAutomaton cs) {
+    private void new_machines() {
         hasC = 0; //(cs != null && cs.composition != null) ? 1 : 0;
-        if (cs != null) { //&& cs.machines != null && cs.machines.size() > 0) { // get set of machines
-                        Nmach = sm.length;
-            
-            machineHasAction = new boolean[Nmach];
-            machineToDrawSet = new boolean[Nmach];
-            machineLayout = new HashMap<Integer, EnumLayout>();
-            graphValidity = new boolean[Nmach];
+        Nmach = sm.length;
+		machineHasAction = new boolean[Nmach];
+		machineToDrawSet = new boolean[Nmach];
+		machineLayout = new HashMap<Integer, EnumLayout>();
+		graphValidity = new boolean[Nmach];
+		
+		graphs = new ExperimentJUNGGraph[Nmach];
 
-            graphs = new ExperimentJUNGGraph[Nmach];
-        } else {
-            Nmach = 0;
-            machineHasAction = null;
-            machineToDrawSet = null;
-            machineLayout = null;
-            graphValidity = null;
-            graphs = null;
-        }
-
-        DefaultListModel lm = new DefaultListModel();
+        DefaultListModel<String> lm = new DefaultListModel<String>();
         for (int i = 0; i < Nmach; i++) {
             if (hasC == 1 && i == (Nmach - 1))
                 lm.addElement("||" + sm[i].getName());

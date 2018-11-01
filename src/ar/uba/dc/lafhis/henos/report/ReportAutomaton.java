@@ -117,5 +117,36 @@ public class ReportAutomaton extends ReportObject{
 	    	  e.printStackTrace();
 	      }		
 	}
+	
+	public String getLabel(int labelLocalIndex) {
+		if(getContext().getAlphabet().getSignals().size() <= labelLocalIndex)
+			return "__tau__";
+		return getContext().getAlphabet().getSignals().get(labelLocalIndex).getName();
+	}
+
+	
+	public String getAutomatonInfo() {
+		String retValue		= "<html>Name:<b>[" + name + "]</b></br>Local Alphabet:[";
+		boolean firstValue	= true;
+		for(int i : getLocalAlphabet()) {
+			if(firstValue)firstValue = false;
+			else	retValue 	+= ",";
+			retValue		+= getLabel(i);
+		}
+		retValue			+= "]</br>Fluents:[";
+		firstValue	= true;
+		for(String s : getContext().getfluents()) {
+			if(firstValue)firstValue = false;
+			else	retValue 	+= ",";
+			retValue		+= s;
+		}
+		for(String s : getContext().getLivenessNames()) {
+			if(firstValue)firstValue = false;
+			else	retValue 	+= ",";
+			retValue		+= s;
+		}
+		retValue			+= "]</html>";
+		return retValue;
+	}
 }
 

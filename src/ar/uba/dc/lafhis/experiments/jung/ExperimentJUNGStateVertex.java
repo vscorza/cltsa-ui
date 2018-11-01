@@ -28,6 +28,6 @@ public class ExperimentJUNGStateVertex {
 	}
 	
 	public String toString() {
-		return String.valueOf(stateIndex) + System.getProperty("line.separator") + stateValue;
+		return "<html><center><small><b>" + String.valueOf(stateIndex) + "</b><p>" + stateValue + "</small></center></html>";
 	}
 }

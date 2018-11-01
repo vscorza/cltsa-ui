@@ -180,14 +180,14 @@ public class ExperimentJUNGViewer extends VisualizationViewer<ExperimentJUNGStat
 //-----------------------------------------------------------------------------	
     private static class EditColors {
     	static class Vertex {
-    		static final Color def = Color.cyan;
+    		static final Color def = new Color(1f,0f,1f,.3f);// Color.cyan;
         	static final Color picked = Color.yellow;
         	static final Color animated = Color.red;
         	static final Color error = Color.magenta;
         	static final Color label = Color.black;    	
     	}
     	static class Edge {
-    	   	static final Color def = Color.darkGray;
+    	   	static final Color def = new Color(.1f,0.1f,.1f,.4f);// Color.darkGray;
         	static final Color picked = Vertex.picked;
         	static final Color animated = Vertex.animated;
         	static final Color label = Vertex.label;    		

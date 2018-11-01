@@ -144,9 +144,7 @@ public class ExperimentJUNGGraph extends DirectedSparseMultigraph<ExperimentJUNG
 		SCCs = new HashMap<ExperimentJUNGGraph,List<Set<ExperimentJUNGStateVertex>>>();
 	}
 	
-	protected String getLabel(ReportAutomaton automaton, int labelLocalIndex) {
-		return automaton.getContext().getAlphabet().getSignals().get(automaton.getLocalAlphabet().get(labelLocalIndex)).getName();
-	}
+
 	
 	public ExperimentJUNGGraph(ReportAutomaton automaton) {
 		this(automaton.getName());
@@ -182,16 +180,14 @@ public class ExperimentJUNGGraph extends DirectedSparseMultigraph<ExperimentJUNG
 					String valuationsString = null;
 					for(ExperimentJUNGGameFluent fluent: currentFluents){
 						
-						if(valuationsString != null)
-							valuationsString += ",";
-						else
-							valuationsString = "[";
-						valuationsString += fluent.toJSONString();
+						if(valuationsString == null)
+							valuationsString = "";
+						valuationsString += fluent.getValue()? "1" : "0";// fluent.toJSONString();
 					}
 					if(valuationsString != null)
-						valuationsString += "]";
+						valuationsString += "";
 					else
-						valuationsString = "[]";
+						valuationsString = "";
 					
 					currentNode 	= new ExperimentJUNGStateVertex(state, valuationsString
 							, automaton.getName());
@@ -225,7 +221,7 @@ public class ExperimentJUNGGraph extends DirectedSparseMultigraph<ExperimentJUNG
 			labels	= new ArrayList<String>();
 			for(int j : transition1.getLabels()) {
 				if(firstLabel) {firstLabel = false;} else {label += ",";}
-				currentLabel	= getLabel(automaton, j);
+				currentLabel	= automaton.getLabel(j);
 				label 			+= currentLabel;
 				labels.add(currentLabel);
 			}
@@ -234,66 +230,15 @@ public class ExperimentJUNGGraph extends DirectedSparseMultigraph<ExperimentJUNG
 			addEdge(currentEdge, game2Graph.get(state), game2Graph.get(transition1.getToState()));
 		}
 		
-		/*
-		mixed = false;
-		HashMap<Integer,ExperimentJUNGStateVertex> stateByNumber =
-				new HashMap<Integer,ExperimentJUNGStateVertex>(); //Used for edges to efficiently get JUNGState objects
-		ArrayList<ExperimentJUNGTransitionEdge> transitions =
-				new ArrayList<ExperimentJUNGTransitionEdge>();
-
-		//Convert all states to vertices in the output graph
-		for (int currentState=0; currentState < automaton.; currentState++) {
-			final ExperimentJUNGStateVertex js = new ExperimentJUNGStateVertex(currentState,automaton.name);
-			addVertex(js);
-			stateByNumber.put(currentState, js);
-
-			try {
-    			@SuppressWarnings("unchecked")
-				final Enumeration<EventState> enumEvent = (Enumeration<EventState>)automaton.states[currentState].elements();
-    			while (enumEvent.hasMoreElements()) {
-    				final EventState event = enumEvent.nextElement();
-    				final String eventName = automaton.alphabet[event.getEvent()];
-    				if (!eventName.startsWith("@")) { 
-    					final TransitionEdge jt = new TransitionEdge(eventName,currentState,event.getNext());
-    					transitions.add(jt);
-    				}
-    			} 
-			} catch (NullPointerException e) {
-				//FIXME this works but shouldn't throw an exception regardless
-				//Happens with Maze in chap 6
-			}
+		List<ExperimentJUNGStateVertex> verticesToRemove	= new ArrayList<ExperimentJUNGStateVertex>();
+		for(ExperimentJUNGStateVertex v : this.getVertices()) {
+			if(getInEdges(v).size() == 0 && getOutEdges(v).size() == 0)
+				verticesToRemove.add(v);
 		}
-
-		//temporarily add the error state
-		final StateVertex jserror = new StateVertex(-1, automaton.name);
-		addVertex(jserror);
-		stateByNumber.put(-1, jserror);
-
-		//Link all the temporary transitions to existing vertices and add them to the ouput graph
-		final Iterator<TransitionEdge> enumTrans = transitions.iterator();
-		while (enumTrans.hasNext()) {
-			final TransitionEdge trans = enumTrans.next();
-			final StateVertex from = stateByNumber.get(trans.getOriginState());
-			final StateVertex to = stateByNumber.get(trans.getDestinationState());
-			if (from != null && to != null) {
-				boolean added = false;
-				for (TransitionEdge jt: getOutEdges(from)) {
-					if (getDest(jt) == to) {
-						jt.addLabel(trans.getFirstLabel());
-						added = true;
-					}
-				}
-				if (!added)
-					addEdge(trans, from, to);
-			}
-			else
-				System.out.println(trans+String.valueOf(trans.getOriginState())+String.valueOf(trans.getDestinationState()));
-		}
-
-		//Don't display the error state if it's never reached
-		if (getIncidentEdges(jserror).size() == 0) {
-			removeVertex(jserror);
-		}*/
+		
+		for(ExperimentJUNGStateVertex v : verticesToRemove)
+			removeVertex(v);
+		
 	}
 
 	/*
