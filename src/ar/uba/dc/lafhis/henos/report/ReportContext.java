@@ -63,6 +63,11 @@ public class ReportContext extends ReportObject {
 					isOK	= false;
 					return;
 				}
+				current = (char) fis.read();
+				if(current != ReportConstants.AUT_SER_OBJ_END) {
+					isOK	= false;
+					return;
+				}
 			}else {
 				livenessNames	= readStringArray(fis, ReportConstants.AUT_SER_OBJ_END);
 			}			
