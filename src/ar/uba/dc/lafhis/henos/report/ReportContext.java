@@ -47,7 +47,13 @@ public class ReportContext extends ReportObject {
 				if(current != ReportConstants.AUT_SER_ARRAY_END) {
 					isOK	= false;
 					return;
-				}		
+				}
+				
+				current = (char) fis.read();
+				if(current != ReportConstants.AUT_SER_SEP) {
+					isOK = false;
+					return;
+				}				
 			}else {
 				fluents	= readStringArray(fis, ReportConstants.AUT_SER_ARRAY_END);
 			}

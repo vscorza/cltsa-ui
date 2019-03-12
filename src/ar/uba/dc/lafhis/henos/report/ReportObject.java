@@ -284,6 +284,11 @@ public abstract class ReportObject {
 				return values;
 			}	
 			do {
+				current		= (char)fis.read();
+				if(current == ReportConstants.AUT_SER_ARRAY_END) {
+					break;
+				}	
+				fis.unread(current);				
 				currentString	= readString(fis, arrayFinalizers);
 				if(!isOK)
 					break;
