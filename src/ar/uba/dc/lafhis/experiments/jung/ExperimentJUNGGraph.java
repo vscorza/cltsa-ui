@@ -176,7 +176,7 @@ public class ExperimentJUNGGraph extends DirectedSparseMultigraph<ExperimentJUNG
 							currentFluents.add(new ExperimentJUNGGameFluent(fluentNames.get(i), automaton.getFluentValuations().get(state).get(i)));
 					}
 					for(i = 0; i < livenessNames.size(); i++) {
-						if(automaton.getLivenessValuations().size() > (state + 1) && automaton.getLivenessValuations().get(state).size() > (i + 1))
+						if(automaton.getLivenessValuations().size() > (state) && automaton.getLivenessValuations().get(state).size() > (i))
 							currentFluents.add(new ExperimentJUNGGameFluent(livenessNames.get(i), automaton.getLivenessValuations().get(state).get(i)));
 					}
 					String valuationsString = null;
