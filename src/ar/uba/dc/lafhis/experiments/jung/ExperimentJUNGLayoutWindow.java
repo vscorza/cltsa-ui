@@ -206,10 +206,17 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
         layoutControls.setFloatable(false);
         canvasTools.add("North", layoutControls);
         
+      
         infoText			= new JTextPane();
         infoText.setContentType("text/html");
         infoText.setText("<html><b>[Status pending]</b></html>");
-        canvasTools.add("South", infoText);
+        JScrollPane southPane;
+        //scrollable list pane
+        southPane = new JScrollPane(infoText,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        southPane.setPreferredSize(new Dimension(southPane.getPreferredSize().width, 100));
+        canvasTools.add("South",southPane);
         
         JPanel leftPanel	= new JPanel(new BorderLayout());
         JButton fileButton	= new JButton("Open File");
