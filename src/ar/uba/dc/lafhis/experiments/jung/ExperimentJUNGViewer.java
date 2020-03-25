@@ -47,12 +47,12 @@ public class ExperimentJUNGViewer extends VisualizationViewer<ExperimentJUNGStat
     
 	private static Transformer<ExperimentJUNGTransitionEdge, Font> edgeFont	= new Transformer<ExperimentJUNGTransitionEdge, Font>(){
 		public Font transform(ExperimentJUNGTransitionEdge edge) {
-				return new Font ("SansSerif", Font.PLAIN , 9);
+				return new Font ("SansSerif", Font.PLAIN , 10);
 		}			 
 	};
 	private static Transformer<ExperimentJUNGStateVertex, Font> vertexFont	= new Transformer<ExperimentJUNGStateVertex, Font>(){
 		public Font transform(ExperimentJUNGStateVertex vertex) {
-				return new Font ("SansSerif", Font.PLAIN , 9);
+				return new Font ("SansSerif", Font.PLAIN , 10);
 		}			 
 	};    
     
