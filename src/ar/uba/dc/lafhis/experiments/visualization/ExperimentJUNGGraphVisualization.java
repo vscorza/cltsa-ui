@@ -101,12 +101,12 @@ public class ExperimentJUNGGraphVisualization extends ExperimentResultVisualizat
 
 		 Transformer<ExperimentJUNGGameEdgeValue<String,Long,String>, Font> edgeFont	= new Transformer<ExperimentJUNGGameEdgeValue<String,Long,String>, Font>(){
 			 public Font transform(ExperimentJUNGGameEdgeValue<String,Long,String> edge) {
-				 return new Font ("Garamond", Font.PLAIN , 11);
+				 return new Font ("SansSerif", Font.PLAIN , 8);
 			 }			 
 		 };
 		 Transformer<ExperimentJUNGGameNodeValue<Long>, Font> vertexFont	= new Transformer<ExperimentJUNGGameNodeValue<Long>, Font>(){
 			 public Font transform(ExperimentJUNGGameNodeValue<Long> vertex) {
-				 return new Font ("Garamond", Font.PLAIN , 11);
+				 return new Font ("SansSerif", Font.PLAIN , 8);
 			 }			 
 		 };		 
 		 
@@ -146,7 +146,7 @@ public class ExperimentJUNGGraphVisualization extends ExperimentResultVisualizat
 		 };
 	     Transformer<ExperimentJUNGGameNodeValue<Long>,Shape> vertexSize = new Transformer<ExperimentJUNGGameNodeValue<Long>,Shape>(){
 	            public Shape transform(ExperimentJUNGGameNodeValue<Long> vertex){
-	                return new Ellipse2D.Double(-5, -5, 10, 10);
+	                return new Ellipse2D.Double(-3, -3, 6, 6);
 	            }
 	     };		 
 		 
@@ -179,9 +179,17 @@ public class ExperimentJUNGGraphVisualization extends ExperimentResultVisualizat
 		    new VisualizationImageServer<ExperimentJUNGGameNodeValue<Long>, ExperimentJUNGGameEdgeValue<String,Long,String>>(
 		    		visualizationViewer.getGraphLayout(), visualizationViewer.getGraphLayout().getSize());
 
-		// Configure the VisualizationImageServer the same way
-		// you did your VisualizationViewer. In my case e.g.
-
+		 Transformer<ExperimentJUNGGameEdgeValue<String,Long,String>, Font> edgeFont	= new Transformer<ExperimentJUNGGameEdgeValue<String,Long,String>, Font>(){
+			 public Font transform(ExperimentJUNGGameEdgeValue<String,Long,String> edge) {
+				 return new Font ("SansSerif", Font.PLAIN , 8);
+			 }			 
+		 };
+		 Transformer<ExperimentJUNGGameNodeValue<Long>, Font> vertexFont	= new Transformer<ExperimentJUNGGameNodeValue<Long>, Font>(){
+			 public Font transform(ExperimentJUNGGameNodeValue<Long> vertex) {
+				 return new Font ("SansSerif", Font.PLAIN , 8);
+			 }			 
+		 };		 
+		 
 		 // Setup up a new vertex to paint transformer...
 		 Transformer<ExperimentJUNGGameNodeValue<Long>,Paint> vertexPaint = new Transformer<ExperimentJUNGGameNodeValue<Long>,Paint>() {
 		 public Paint transform(ExperimentJUNGGameNodeValue<Long> vertex) {
@@ -216,6 +224,17 @@ public class ExperimentJUNGGraphVisualization extends ExperimentResultVisualizat
 				 return noncontrollableStroke;
 		 }
 		 };
+	     Transformer<ExperimentJUNGGameNodeValue<Long>,Shape> vertexSize = new Transformer<ExperimentJUNGGameNodeValue<Long>,Shape>(){
+	            public Shape transform(ExperimentJUNGGameNodeValue<Long> vertex){
+	                return new Ellipse2D.Double(-3, -3, 6, 6);
+	            }
+	     };		 
+		 
+		 Transformer<Context<Graph<ExperimentJUNGGameNodeValue<Long>, ExperimentJUNGGameEdgeValue<String,Long,String>>, ExperimentJUNGGameEdgeValue<String,Long,String>>,Shape> edgeArrowTransformer = 
+				 new DirectionalEdgeArrowTransformer<ExperimentJUNGGameNodeValue<Long>, ExperimentJUNGGameEdgeValue<String,Long,String>>(10, 8, 4);
+		 DefaultModalGraphMouse<ExperimentJUNGGameNodeValue<Long>, ExperimentJUNGGameEdgeValue<String,Long,String>> gm = new DefaultModalGraphMouse<ExperimentJUNGGameNodeValue<Long>, ExperimentJUNGGameEdgeValue<String,Long,String>>();
+		 gm.setMode(Mode.TRANSFORMING);
+		 /*
 		 
 		 visualizationServer.setBackground(Color.WHITE);
 		 visualizationServer.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
@@ -223,8 +242,20 @@ public class ExperimentJUNGGraphVisualization extends ExperimentResultVisualizat
 		 visualizationServer.getRenderContext().setEdgeStrokeTransformer(edgeStrokeTransformer);
 		 visualizationServer.getRenderContext().setVertexLabelTransformer(new ToStringLabeller());
 		 visualizationServer.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller());
-		 visualizationServer.getRenderer().getVertexLabelRenderer().setPosition(Position.SE);
-	
+		 */
+		 visualizationServer.getRenderContext().setVertexLabelTransformer(new ToStringLabeller());
+		 visualizationServer.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller());
+		 visualizationServer.setBackground(Color.WHITE);
+		 visualizationServer.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
+		 visualizationServer.getRenderContext().setVertexStrokeTransformer(vertexStroke);
+		 visualizationServer.getRenderContext().setEdgeStrokeTransformer(edgeStrokeTransformer);
+		 visualizationServer.getRenderContext().setEdgeFontTransformer(edgeFont);
+		 visualizationServer.getRenderContext().setVertexFontTransformer(vertexFont);
+		 visualizationServer.getRenderContext().setVertexShapeTransformer(vertexSize);
+		 
+		 visualizationServer.getRenderContext().setEdgeArrowStrokeTransformer(edgeStrokeTransformer);
+		 visualizationServer.getRenderContext().setEdgeArrowTransformer(edgeArrowTransformer);		 
+		 visualizationServer.getRenderer().getVertexLabelRenderer().setPosition(Position.SE);	
 	}
 	
 	@Override

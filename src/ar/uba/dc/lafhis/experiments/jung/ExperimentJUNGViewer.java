@@ -7,7 +7,9 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.HashSet;
@@ -43,6 +45,24 @@ public class ExperimentJUNGViewer extends VisualizationViewer<ExperimentJUNGStat
     private ExperimentJUNGNavigator navigator;
     private ExperimentJUNGCanvas canvas;
     
+	private static Transformer<ExperimentJUNGTransitionEdge, Font> edgeFont	= new Transformer<ExperimentJUNGTransitionEdge, Font>(){
+		public Font transform(ExperimentJUNGTransitionEdge edge) {
+				return new Font ("SansSerif", Font.PLAIN , 9);
+		}			 
+	};
+	private static Transformer<ExperimentJUNGStateVertex, Font> vertexFont	= new Transformer<ExperimentJUNGStateVertex, Font>(){
+		public Font transform(ExperimentJUNGStateVertex vertex) {
+				return new Font ("SansSerif", Font.PLAIN , 9);
+		}			 
+	};    
+    
+	private static Transformer<ExperimentJUNGStateVertex,Shape> vertexSize = new Transformer<ExperimentJUNGStateVertex,Shape>(){
+        public Shape transform(ExperimentJUNGStateVertex vertex){
+            return new Ellipse2D.Double(-3, -3, 6, 6);
+        }
+	};		 
+ 
+	
 	public ExperimentJUNGViewer(Layout<ExperimentJUNGStateVertex, ExperimentJUNGTransitionEdge> layout, Dimension preferredSize, ExperimentJUNGCanvas canvas) {
 		super(layout, preferredSize);
 		
@@ -187,7 +207,7 @@ public class ExperimentJUNGViewer extends VisualizationViewer<ExperimentJUNGStat
         	static final Color label = Color.black;    	
     	}
     	static class Edge {
-    	   	static final Color def = new Color(.1f,0.1f,.1f,.4f);// Color.darkGray;
+    	   	static final Color def = new Color(.1f,0.1f,.1f,.2f);// Color.darkGray;
         	static final Color picked = Vertex.picked;
         	static final Color animated = Vertex.animated;
         	static final Color label = Vertex.label;    		
@@ -196,14 +216,14 @@ public class ExperimentJUNGViewer extends VisualizationViewer<ExperimentJUNGStat
 
     private static class NavigationColors {
     	static class Vertex {
-	    	static final Color def = Color.darkGray;
+	    	static final Color def = new Color(.1f,0.1f,.1f,.2f);// Color.darkGray;//was darkgray
 	    	static final Color navigated = Color.lightGray;
 	    	static final Color next = Color.red;
 	    	static final Color current = Color.orange;
 	    	static final Color label = Color.black;
     	}
     	static class Edge {
-	    	static final Color def = Color.black;
+	    	static final Color def  = new Color(.1f,0.1f,.1f,.2f);// Color.darkGray;//Color.black;
 	    	static final Color next = Vertex.next;
 	    	static final Color label = Vertex.label;
 	    	static final Color label_next = Color.orange;
@@ -269,13 +289,17 @@ public class ExperimentJUNGViewer extends VisualizationViewer<ExperimentJUNGStat
                 return out;
             }
         }
+
         final Transformer<ExperimentJUNGTransitionEdge,Paint> colorer = new EdgePaintTransformer();
         final DefaultEdgeLabelRenderer labelColorer = new EdgeLabelColorRenderer();
         final Transformer<ExperimentJUNGTransitionEdge,Paint> arrowColorer = new EdgePaintTransformer();
         final Transformer<ExperimentJUNGTransitionEdge,Paint> arrowFiller = new EdgePaintTransformer();
         final QuadCurve<ExperimentJUNGStateVertex, ExperimentJUNGTransitionEdge> shaper = new EdgeShape.QuadCurve<ExperimentJUNGStateVertex,ExperimentJUNGTransitionEdge>();
         shaper.setControlOffsetIncrement(canvas.getCurve());
-        
+
+        getRenderContext().setVertexShapeTransformer(vertexSize);
+		getRenderContext().setEdgeFontTransformer(edgeFont);
+		getRenderContext().setVertexFontTransformer(vertexFont);
     	getRenderContext().setEdgeLabelTransformer(stringer);
     	getRenderContext().setEdgeDrawPaintTransformer(colorer);
     	getRenderContext().setEdgeLabelRenderer(labelColorer);
@@ -325,6 +349,9 @@ public class ExperimentJUNGViewer extends VisualizationViewer<ExperimentJUNGStat
         final QuadCurve<ExperimentJUNGStateVertex, ExperimentJUNGTransitionEdge> shaper = new EdgeShape.QuadCurve<ExperimentJUNGStateVertex,ExperimentJUNGTransitionEdge>();
         shaper.setControlOffsetIncrement(canvas.getCurve());
 
+        getRenderContext().setVertexShapeTransformer(vertexSize);
+		getRenderContext().setEdgeFontTransformer(edgeFont);
+		getRenderContext().setVertexFontTransformer(vertexFont);
     	getRenderContext().setEdgeLabelTransformer(stringer);
     	getRenderContext().setEdgeDrawPaintTransformer(colorer);
     	getRenderContext().setEdgeLabelRenderer(new EdgeLabelColorRenderer());
@@ -380,6 +407,9 @@ public class ExperimentJUNGViewer extends VisualizationViewer<ExperimentJUNGStat
         }
         final Transformer<ExperimentJUNGStateVertex,Paint> colorer = new VertexPaintTransformer();
 
+        getRenderContext().setVertexShapeTransformer(vertexSize);
+		getRenderContext().setEdgeFontTransformer(edgeFont);
+		getRenderContext().setVertexFontTransformer(vertexFont);
     	getRenderContext().setVertexLabelTransformer(stringer);
     	getRenderContext().setVertexFillPaintTransformer(colorer);
     	DefaultVertexLabelRenderer labeler = new VertexLabelColorRenderer(NavigationColors.Vertex.label, NavigationColors.Vertex.label);
@@ -431,6 +461,9 @@ public class ExperimentJUNGViewer extends VisualizationViewer<ExperimentJUNGStat
         final Transformer<ExperimentJUNGStateVertex,Paint> colorer = new VertexPaintTransformer(getPickedVertexState());
         final VertexLabelColorRenderer labeler = new VertexLabelColorRenderer(EditColors.Vertex.label, EditColors.Vertex.label);
 
+        getRenderContext().setVertexShapeTransformer(vertexSize);
+		getRenderContext().setEdgeFontTransformer(edgeFont);
+		getRenderContext().setVertexFontTransformer(vertexFont);
     	getRenderContext().setVertexLabelTransformer(stringer);
     	getRenderContext().setVertexFillPaintTransformer(colorer);
     	getRenderContext().setVertexLabelRenderer(labeler);
