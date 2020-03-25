@@ -8,7 +8,7 @@ public class ReportSignal extends ReportObject{
 	protected String name;
 	protected ReportSignalType type;
 	
-	public String getName() {return name; }
+	public String getName() {return name.replace(".on", "↑").replace(".off","↓"); }
 	public ReportSignalType getType() {return type;}
 	//<name,type>
 	public ReportSignal(PushbackInputStream fis) {
