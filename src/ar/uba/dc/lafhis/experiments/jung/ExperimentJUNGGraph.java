@@ -184,7 +184,7 @@ public class ExperimentJUNGGraph extends DirectedSparseMultigraph<ExperimentJUNG
 						
 						if(valuationsString == null)
 							valuationsString = "";
-						valuationsString += fluent.getValue()? "1" : "0";// fluent.toJSONString();
+						valuationsString += fluent.getValue()? "▪" : "▫";// fluent.toJSONString();
 					}
 					if(valuationsString != null)
 						valuationsString += "";

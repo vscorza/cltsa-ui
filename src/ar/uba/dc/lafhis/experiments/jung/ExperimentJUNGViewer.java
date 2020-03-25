@@ -58,10 +58,69 @@ public class ExperimentJUNGViewer extends VisualizationViewer<ExperimentJUNGStat
     
 	private static Transformer<ExperimentJUNGStateVertex,Shape> vertexSize = new Transformer<ExperimentJUNGStateVertex,Shape>(){
         public Shape transform(ExperimentJUNGStateVertex vertex){
-            return new Ellipse2D.Double(-3, -3, 6, 6);
+            return new Ellipse2D.Double(-9, -9, 18, 18);
         }
 	};		 
  
+    public class EdgePaintTransformer implements Transformer<ExperimentJUNGTransitionEdge,Paint> {
+        public EdgePaintTransformer() { 
+            super();
+        }
+    	public Paint transform(ExperimentJUNGTransitionEdge e) {
+    		return navigator.getPath().contains(e) ?
+    					NavigationColors.Edge.next
+    				:
+    					NavigationColors.Edge.def;
+    	}
+    };
+  
+    public class EdgeLabelColorRenderer extends DefaultEdgeLabelRenderer {
+        public EdgeLabelColorRenderer() {
+            super(NavigationColors.Edge.label);
+        }
+
+		public <E> Component getEdgeLabelRendererComponent(JComponent vv, Object value,
+                Font font, boolean isSelected, E edge) {
+            Component out = super.getEdgeLabelRendererComponent(vv, value, font, isSelected, edge);
+            super.setForeground(
+            		navigator.getPath().contains(edge) ?
+            				NavigationColors.Edge.label_next
+            				:
+            					NavigationColors.Edge.label
+            		);
+            return out;
+        }
+    }
+
+    public class VertexPaintTransformer implements Transformer<ExperimentJUNGStateVertex,Paint> {
+        public VertexPaintTransformer() { 
+            super();
+        }
+    	public Paint transform(ExperimentJUNGStateVertex e) {
+    		return navigator.getPath().contains(e) ?
+    					NavigationColors.Edge.next
+    				:
+    					NavigationColors.Edge.def;
+    	}
+    };
+  
+    public class VertexLabelColorRenderer extends DefaultVertexLabelRenderer {
+        public VertexLabelColorRenderer() {
+            super(NavigationColors.Edge.label);
+        }
+
+		public <E> Component getVertexLabelRendererComponent(JComponent vv, Object value,
+                Font font, boolean isSelected, E edge) {
+            Component out = super.getVertexLabelRendererComponent(vv, value, font, isSelected, edge);
+            super.setForeground(
+            		navigator.getPath().contains(edge) ?
+            				NavigationColors.Edge.label_next
+            				:
+            					NavigationColors.Edge.label
+            		);
+            return out;
+        }
+    }
 	
 	public ExperimentJUNGViewer(Layout<ExperimentJUNGStateVertex, ExperimentJUNGTransitionEdge> layout, Dimension preferredSize, ExperimentJUNGCanvas canvas) {
 		super(layout, preferredSize);
@@ -200,7 +259,7 @@ public class ExperimentJUNGViewer extends VisualizationViewer<ExperimentJUNGStat
 //-----------------------------------------------------------------------------	
     private static class EditColors {
     	static class Vertex {
-    		static final Color def = new Color(1f,0f,1f,.3f);// Color.cyan;
+    		static final Color def = new Color(1f,1f,1f,.3f);// Color.cyan;
         	static final Color picked = Color.yellow;
         	static final Color animated = Color.red;
         	static final Color error = Color.magenta;
@@ -260,41 +319,17 @@ public class ExperimentJUNGViewer extends VisualizationViewer<ExperimentJUNGStat
             }
         };
         
-        class EdgePaintTransformer implements Transformer<ExperimentJUNGTransitionEdge,Paint> {
-            public EdgePaintTransformer() { 
-                super();
-            }
-        	public Paint transform(ExperimentJUNGTransitionEdge e) {
-        		return navigator.getPath().contains(e) ?
-        					NavigationColors.Edge.next
-        				:
-        					NavigationColors.Edge.def;
-        	}
-        };
-      
-        class EdgeLabelColorRenderer extends DefaultEdgeLabelRenderer {
-            public EdgeLabelColorRenderer() {
-                super(NavigationColors.Edge.label);
-            }
-
-			public <E> Component getEdgeLabelRendererComponent(JComponent vv, Object value,
-                    Font font, boolean isSelected, E edge) {
-                Component out = super.getEdgeLabelRendererComponent(vv, value, font, isSelected, edge);
-                super.setForeground(
-                		navigator.getPath().contains(edge) ?
-                				NavigationColors.Edge.label_next
-                				:
-                					NavigationColors.Edge.label
-                		);
-                return out;
-            }
-        }
+        final Transformer<ExperimentJUNGStateVertex,Paint> vColorer = new VertexPaintTransformer();
+        final DefaultVertexLabelRenderer vLabelColorer = new VertexLabelColorRenderer();
+    	getRenderContext().setVertexDrawPaintTransformer(vColorer);
+    	getRenderContext().setVertexLabelRenderer(vLabelColorer);
 
         final Transformer<ExperimentJUNGTransitionEdge,Paint> colorer = new EdgePaintTransformer();
         final DefaultEdgeLabelRenderer labelColorer = new EdgeLabelColorRenderer();
         final Transformer<ExperimentJUNGTransitionEdge,Paint> arrowColorer = new EdgePaintTransformer();
         final Transformer<ExperimentJUNGTransitionEdge,Paint> arrowFiller = new EdgePaintTransformer();
         final QuadCurve<ExperimentJUNGStateVertex, ExperimentJUNGTransitionEdge> shaper = new EdgeShape.QuadCurve<ExperimentJUNGStateVertex,ExperimentJUNGTransitionEdge>();
+        
         shaper.setControlOffsetIncrement(canvas.getCurve());
 
         getRenderContext().setVertexShapeTransformer(vertexSize);
@@ -345,6 +380,11 @@ public class ExperimentJUNGViewer extends VisualizationViewer<ExperimentJUNGStat
                 return out;
             }
         }
+        final Transformer<ExperimentJUNGStateVertex,Paint> vColorer = new VertexPaintTransformer();
+        final DefaultVertexLabelRenderer vLabelColorer = new VertexLabelColorRenderer();
+    	getRenderContext().setVertexDrawPaintTransformer(vColorer);
+    	getRenderContext().setVertexLabelRenderer(vLabelColorer);
+       
         final Transformer<ExperimentJUNGTransitionEdge,Paint> colorer = new EdgePaintTransformer(this.getPickedEdgeState());
         final QuadCurve<ExperimentJUNGStateVertex, ExperimentJUNGTransitionEdge> shaper = new EdgeShape.QuadCurve<ExperimentJUNGStateVertex,ExperimentJUNGTransitionEdge>();
         shaper.setControlOffsetIncrement(canvas.getCurve());
@@ -405,6 +445,10 @@ public class ExperimentJUNGViewer extends VisualizationViewer<ExperimentJUNGStat
                 return out;
 			}
         }
+        final Transformer<ExperimentJUNGStateVertex,Paint> vColorer = new VertexPaintTransformer();
+        
+    	getRenderContext().setVertexDrawPaintTransformer(vColorer);
+
         final Transformer<ExperimentJUNGStateVertex,Paint> colorer = new VertexPaintTransformer();
 
         getRenderContext().setVertexShapeTransformer(vertexSize);
@@ -458,6 +502,9 @@ public class ExperimentJUNGViewer extends VisualizationViewer<ExperimentJUNGStat
                 return out;
 			}
         }
+
+        
+        
         final Transformer<ExperimentJUNGStateVertex,Paint> colorer = new VertexPaintTransformer(getPickedVertexState());
         final VertexLabelColorRenderer labeler = new VertexLabelColorRenderer(EditColors.Vertex.label, EditColors.Vertex.label);
 
