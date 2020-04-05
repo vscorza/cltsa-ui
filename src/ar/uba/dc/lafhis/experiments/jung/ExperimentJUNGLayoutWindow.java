@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.io.*;
 
 /**
  * The layout window to display machines according to layout algorithms
@@ -219,6 +220,88 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
         canvasTools.add("South",southPane);
         
         JPanel leftPanel	= new JPanel(new BorderLayout());
+        JPanel innerLeftPanel	= new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+       
+        JButton runButton	= new JButton("Run Spec");
+        runButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				JFileChooser chooser = new JFileChooser();
+				chooser.setCurrentDirectory(new File("../henos-automata/src/tests"));
+				chooser.setMultiSelectionEnabled(false);
+				chooser.setFileFilter(new FileFilter() {
+					public boolean accept(File f) {
+						return f.getName().toLowerCase().endsWith(".fsp")
+						|| f.isDirectory();
+					}
+					
+					public String getDescription() {
+					return "FSP Files";
+					}
+				});
+				int r = chooser.showOpenDialog(frame);
+				if (r == JFileChooser.APPROVE_OPTION) {
+					try {
+						infoText.setText("");
+						String s, s2 = "";
+						File f	= chooser.getSelectedFile();
+						String filename = f.getPath();
+						String cmdString	= "../henos-automata/src/cltsa -r " + filename;
+						s2+= "Running the following command: " + cmdString + "\n";
+			            Process p = Runtime.getRuntime().exec(cmdString);
+			            BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+						BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+						s2+="Here is the standard output of the command:\n";
+
+						while ((s = stdInput.readLine()) != null) {
+							s2+=s;
+						}
+						s2.concat("Here is the standard error of the command (if any):\n");
+						while ((s = stdError.readLine()) != null) {
+							s2+=s;
+						}
+						System.out.println(s2);
+						infoText.setText(s2);
+				        File directory = new File("/tmp");
+				        File[] fileList = directory.listFiles(new FilenameFilter() {
+							
+							@Override
+							public boolean accept(File f, String name) {
+								return name.toLowerCase().endsWith(".rep");
+							}
+						});
+						try {
+							int fileCount	= fileList.length;
+							sm				= new ReportAutomaton[fileCount];
+							fileCount		= 0;
+							for(File f2: fileList) {
+								filename = f2.getPath();
+								FileInputStream is;
+									is = new FileInputStream(f2);
+								
+								sm[fileCount++]	= new ReportAutomaton(new PushbackInputStream(is));
+							}
+						} catch (FileNotFoundException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}					
+				        new_machines();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}					
+				}
+			}
+
+		});
+        innerLeftPanel.add(runButton, gbc);        
         JButton fileButton	= new JButton("Open File");
         fileButton.addActionListener(new ActionListener() {
 			
@@ -260,7 +343,8 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 			}
 
 		});
-        leftPanel.add("North", fileButton);
+        innerLeftPanel.add(fileButton, gbc);
+        leftPanel.add("North", innerLeftPanel);
         leftPanel.add("Center", left);
         
         setLeftComponent(leftPanel);
