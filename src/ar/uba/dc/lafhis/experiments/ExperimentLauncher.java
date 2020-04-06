@@ -45,10 +45,13 @@ public class ExperimentLauncher {
 		    // If Nimbus is not available, you can set the GUI to another look and feel.
 		}
 		
-		JFrame frame = new JFrame("Simple Graph View");
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		JFrame frame = new JFrame("CLTSA (Alpha)");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(new Dimension(screenSize.width - 200, screenSize.height - 200));
+		//Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		//frame.setSize(new Dimension(screenSize.width - 200, screenSize.height - 200));
+		frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
+		frame.setUndecorated(true);
+		frame.setVisible(true);
 		frame.getContentPane().add(new ExperimentJUNGLayoutWindow());
 		frame.setVisible(true); 
 	}

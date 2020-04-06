@@ -6,6 +6,7 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.text.DefaultCaret;
 
 import ar.uba.dc.lafhis.experiments.jung.ExperimentJUNGCanvas.EnumLayout;
 import ar.uba.dc.lafhis.experiments.jung.ExperimentJUNGCanvas.EnumMode;
@@ -64,6 +65,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
     Font f4 = new Font("SansSerif", Font.BOLD, 16);
 
     JTextPane infoText;
+    JTextPane visualizationText;
     
     ImageIcon drawIcon;
 
@@ -101,22 +103,36 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
         editingPane.setPreferredSize(new Dimension(editingPane.getPreferredSize().width, 100));        
         editingPanel.add("Center", editingPane);
         
-        tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Editor", editingPanel);
-        tabbedPane.addTab("Visualization", canvasTools);
         
         infoText			= new JTextPane();
         infoText.setContentType("text/html");
-        infoText.setText("<html><b>[Status pending]</b></html>");
-        JScrollPane southPane;
-        //scrollable list pane
-        southPane = new JScrollPane(infoText,
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+        infoText.setText("Welcome to the <font color='blue'><b>C</b>oncurrent <b>L</b>abeled <b>T</b>ransition <b>S</b>ystem <b>A</b>nalyzer</font>.<br>Feel free to contact me at <a href='mailto:vscorza@gmail.com'>vscorza@gmail.com</a><br><b>[Status pending]</b></html>");
+        visualizationText	= new JTextPane();
+        visualizationText.setContentType("text/html");
+        visualizationText.setText(infoText.getText());
+        
+        DefaultCaret caret = (DefaultCaret) infoText.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        caret = (DefaultCaret) visualizationText.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        
+        JScrollPane editorSouthPane = new JScrollPane(infoText, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        southPane.setPreferredSize(new Dimension(southPane.getPreferredSize().width, 100));
+        editorSouthPane.setPreferredSize(new Dimension(editorSouthPane.getPreferredSize().width, 150));
+        editingPanel.add("South", editorSouthPane);
+        
+        JScrollPane visualizationSouthPane = new JScrollPane(visualizationText, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        visualizationSouthPane.setPreferredSize(new Dimension(visualizationSouthPane.getPreferredSize().width, 150));
+        canvasTools.add("South", visualizationSouthPane);
+        
+        tabbedPane = new JTabbedPane();
+        
+        tabbedPane.addTab("Editor", editingPanel);
+        tabbedPane.addTab("Visualization", canvasTools);        
+        
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.add("Center", tabbedPane);
-        mainPanel.add("South",southPane);
         
 
         ArrayList<EnumLayout> layoutTypes = new ArrayList<EnumLayout>();
@@ -237,7 +253,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
         canvasTools.add("North", layoutControls);
         
 		JFileChooser chooser = new JFileChooser();
-		chooser.setPreferredSize(new Dimension(800, 600));
+		chooser.setPreferredSize(new Dimension(950, 600));
         
         JPanel leftPanel	= new JPanel(new BorderLayout());
         JPanel innerLeftPanel	= new JPanel(new GridBagLayout());
@@ -280,8 +296,8 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 						editingArea.setText(s2);
 						tabbedPane.setSelectedIndex(0);
 					} catch (IOException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
+						infoText.setText(e1.getMessage());
 					}					
 				}
 			}
@@ -302,8 +318,8 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 					editingArea.write(fw);
 					fw.close();
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
+					infoText.setText(e1.getMessage());
 				}									
 			}
 
@@ -339,8 +355,8 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 					editingArea.write(fw);
 					fw.close();
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
+					infoText.setText(e1.getMessage());
 				}									
 			}
 
@@ -357,7 +373,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 						FileWriter fw = new FileWriter(f.getAbsoluteFile(), false);
 						editingArea.write(fw);
 						fw.close();
-						infoText.setText(compile(f));
+						compile(f);
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					}					
@@ -385,7 +401,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 				});
 				int r = chooser.showOpenDialog(frame);
 				if (r == JFileChooser.APPROVE_OPTION) {
-					infoText.setText(compile(chooser.getSelectedFile()));
+					compile(chooser.getSelectedFile());
 				}
 			}
 
@@ -442,30 +458,49 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
     }
 
     private String compile(File f) {
-    	String s = "", s2 = "";
 		String filename = f.getPath();
 		String cmdString	= "../henos-automata/src/cltsa -r " + filename;
-		s2+= "Running the following command: " + cmdString + "\n";
-		try {		
-	        Process p = Runtime.getRuntime().exec(cmdString);
-	        BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-	
-			BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-			s2+="Here is the standard output of the command:\n";
-	
-			while ((s = stdInput.readLine()) != null) {
-				s2+=s;
-			}
-			s2.concat("Here is the standard error of the command (if any):\n");
-			while ((s = stdError.readLine()) != null) {
-				s2+=s;
-			}
-	    	return s2+=openReports();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			return e1.getMessage();
-		}	
+		String s3 = "Running the following command: <i>" + cmdString + "</i><br>";
+		infoText.setText(s3);
+		Thread cmdThread = new Thread() {
+			public void run() {
+				try {
+					String s = "", s2 = "";
+
+				Process p = Runtime.getRuntime().exec(cmdString);
+		        BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+		
+				BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+				
+				boolean hasStd = false;
+				while ((s = stdInput.readLine()) != null) {
+					if(!hasStd) {
+						s2+="<b>Here is the standard output of the command:</b><br>";
+						hasStd = true;
+					}
+					s2+=s + "<br>";
+					infoText.setText(s2);
+				}
+				boolean hasError = false;
+				
+				while ((s = stdError.readLine()) != null) {
+					if(!hasError) {
+						s2+= "Here is the standard error of the command (if any):\n";
+						hasError = true;
+					}
+					s2+=s + "<br>";
+					infoText.setText(s2);
+				}
+		    	s2+=openReports();
+		    	infoText.setText(s2);
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}	
+				}
+		};
+		cmdThread.setDaemon(true);
+		cmdThread.start();
+	    return "";
     }
     
     private String openReports() {
@@ -488,7 +523,6 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 				sm[fileCount++]	= new ReportAutomaton(new PushbackInputStream(is));
 			}
 		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			return e1.getMessage();
 		}					
@@ -541,7 +575,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
             int machine = list.getSelectedIndex();
             if (machine < 0 || machine >= Nmach) return;
 
-            infoText.setText(sm[machine].getAutomatonInfo());
+            visualizationText.setText(sm[machine].getAutomatonInfo());
             
             if (singleMode) {
                 if (stateLimit > 0 && sm[machine].getTransitions().size() > stateLimit) {
