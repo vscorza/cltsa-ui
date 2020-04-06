@@ -6,7 +6,10 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Highlighter;
 
 import ar.uba.dc.lafhis.experiments.jung.ExperimentJUNGCanvas.EnumLayout;
 import ar.uba.dc.lafhis.experiments.jung.ExperimentJUNGCanvas.EnumMode;
@@ -15,8 +18,10 @@ import ar.uba.dc.lafhis.henos.report.ReportAutomaton;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -66,6 +71,11 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 
     JTextPane infoText;
     JTextPane visualizationText;
+    JTextField searchField;
+    JTextField replaceField;
+    JCheckBox caseSensitiveCheckBox;
+    JTextArea editingArea;
+    Highlighter.HighlightPainter painter;
     
     ImageIcon drawIcon;
 
@@ -90,7 +100,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
         canvasTools.add("Center", output);
         
         JPanel editingPanel = new JPanel(new BorderLayout());
-        JTextArea editingArea = new JTextArea();
+        editingArea = new JTextArea();
         Font font = new Font("Courier New", Font.PLAIN, 11);
         editingArea.setFont(font);
         editingArea.setBackground(Color.BLACK);
@@ -103,7 +113,32 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
         editingPane.setPreferredSize(new Dimension(editingPane.getPreferredSize().width, 100));        
         editingPanel.add("Center", editingPane);
         
-        
+        painter = new DefaultHighlighter.DefaultHighlightPainter(Color.orange);
+
+        JPanel searchPanel	= new JPanel(new FlowLayout());
+        searchPanel.add(new JLabel("Search:"));
+        searchField	= new JTextField(30);
+        searchPanel.add(searchField);
+        searchPanel.add(new JLabel("Replace:"));
+        replaceField	= new JTextField(30);
+        searchPanel.add(replaceField);
+        searchPanel.add(new JLabel("Case Sensitive:"));
+        caseSensitiveCheckBox	= new JCheckBox();
+        searchPanel.add(caseSensitiveCheckBox);
+        JButton searchButton = new JButton("Search");
+        searchPanel.add(searchButton);
+        searchButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent arg0) {searchReplace(true, false);}});
+        JButton replaceButton = new JButton("Replace");
+        searchPanel.add(replaceButton);
+        replaceButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent arg0) {searchReplace(false, false);}});
+        JButton searchAllButton = new JButton("Search All");
+        searchPanel.add(searchAllButton);
+        searchAllButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent arg0) {searchReplace(true, true);}});
+        JButton replaceAllButton = new JButton("Replace All");
+        searchPanel.add(replaceAllButton);
+        replaceAllButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent arg0) {searchReplace(false, true);}});
+        searchPanel.setPreferredSize(new Dimension(searchPanel.getPreferredSize().width, 40));
+        editingPanel.add("North", searchPanel);
         infoText			= new JTextPane();
         infoText.setContentType("text/html");
         infoText.setText("Welcome to the <font color='blue'><b>C</b>oncurrent <b>L</b>abeled <b>T</b>ransition <b>S</b>ystem <b>A</b>nalyzer</font>.<br>Feel free to contact me at <a href='mailto:vscorza@gmail.com'>vscorza@gmail.com</a><br><b>[Status pending]</b></html>");
@@ -263,6 +298,13 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         
         JButton openButton	= new JButton("Open FSP");
+        JButton saveFSPButton	= new JButton("Save FSP");
+        JButton saveFSPAsButton	= new JButton("Save FSP As...");
+        JButton runButton	= new JButton("Compile");
+        JButton compileButton	= new JButton("Compile from File");
+        JButton fileButton	= new JButton("Open Reports");
+        
+        
         openButton.addActionListener(new ActionListener() {
 			
 			@Override
@@ -304,7 +346,6 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 
 		});
         innerLeftPanel.add(openButton, gbc);  
-        JButton saveFSPButton	= new JButton("Save FSP");
         saveFSPButton.addActionListener(new ActionListener() {
 			
 			@Override
@@ -312,9 +353,8 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 				if(lastOpenedFile.trim().length() < 1)return;
 				try {
 					infoText.setText("");
-					String s, s2 = "";
 					File f = new File(lastOpenedFile);
-					FileWriter fw = new FileWriter(f.getAbsoluteFile(), true);
+					FileWriter fw = new FileWriter(f.getAbsoluteFile(), false);
 					editingArea.write(fw);
 					fw.close();
 				} catch (IOException e1) {
@@ -325,7 +365,6 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 
 		});
         innerLeftPanel.add(saveFSPButton, gbc);  
-        JButton saveFSPAsButton	= new JButton("Save FSP As...");
         saveFSPAsButton.addActionListener(new ActionListener() {
 			
 			@Override
@@ -348,10 +387,8 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 					if (r == JFileChooser.APPROVE_OPTION) {
 						lastOpenedFile = chooser.getSelectedFile().getPath();
 					}else return;
-					
-					String s, s2 = "";
 					File f = new File(lastOpenedFile);
-					FileWriter fw = new FileWriter(f.getAbsoluteFile(), true);
+					FileWriter fw = new FileWriter(f.getAbsoluteFile(), false);
 					editingArea.write(fw);
 					fw.close();
 				} catch (IOException e1) {
@@ -362,8 +399,6 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 
 		});
         innerLeftPanel.add(saveFSPAsButton, gbc);  
-
-        JButton runButton	= new JButton("Compile");
         runButton.addActionListener(new ActionListener() {
 			
 			@Override
@@ -381,8 +416,6 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 
 		});
         innerLeftPanel.add(runButton, gbc);        
-
-        JButton compileButton	= new JButton("Compile from File");
         compileButton.addActionListener(new ActionListener() {
 			
 			@Override
@@ -407,7 +440,6 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 
 		});
         innerLeftPanel.add(compileButton, gbc);        
-        JButton fileButton	= new JButton("Open Reports");
         fileButton.addActionListener(new ActionListener() {
 			
 			@Override
@@ -444,6 +476,24 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 			}
 
 		});
+        
+        openButton.setMnemonic(KeyEvent.VK_O);
+        registerKeyboardAction(new ActionListener(){public void actionPerformed(final ActionEvent actionEvent) {openButton.doClick();}}, 
+        		KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        saveFSPButton.setMnemonic(KeyEvent.VK_S);
+        registerKeyboardAction(new ActionListener(){public void actionPerformed(final ActionEvent actionEvent) {saveFSPButton.doClick();}}, 
+        		KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        saveFSPAsButton.setMnemonic(KeyEvent.VK_A);
+        registerKeyboardAction(new ActionListener(){public void actionPerformed(final ActionEvent actionEvent) {saveFSPAsButton.doClick();}}, 
+        		KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        compileButton.setMnemonic(KeyEvent.VK_C);
+        registerKeyboardAction(new ActionListener(){public void actionPerformed(final ActionEvent actionEvent) {compileButton.doClick();}}, 
+        		KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        fileButton.setMnemonic(KeyEvent.VK_R);
+        registerKeyboardAction(new ActionListener(){public void actionPerformed(final ActionEvent actionEvent) {fileButton.doClick();}}, 
+        		KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        
+        
         innerLeftPanel.add(fileButton, gbc);
         innerLeftPanel.add(new JLabel("Reports"), gbc);
         leftPanel.add("North", innerLeftPanel);
@@ -457,6 +507,33 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 
     }
 
+    private void searchReplace(boolean isSearch, boolean isAll) {
+    	if(!isSearch) {
+    		String prefix = caseSensitiveCheckBox.isSelected()? "(?i)" : "";
+    		if(isAll) {
+    			editingArea.setText(editingArea.getText().replaceAll(prefix + searchField.getText(), replaceField.getText()));
+    		}else {
+    			editingArea.setText(editingArea.getText().replaceFirst(prefix + searchField.getText(), replaceField.getText()));
+    		}
+    	}else {
+	    	String src = caseSensitiveCheckBox.isSelected()? editingArea.getText().toLowerCase() : editingArea.getText();
+	    	String target = caseSensitiveCheckBox.isSelected()? searchField.getText().toLowerCase() : searchField.getText();
+	        int offset = src.indexOf(target);
+	        int length = target.length();
+	        
+	        while (offset != -1) {
+	            try {
+	                editingArea.getHighlighter().addHighlight(offset, offset + length, painter);
+	                offset = src.indexOf(target, offset + 1);
+	                if(!isAll)
+	                	break;
+	            } catch (BadLocationException ex) {
+	                System.err.println("An error occured, please try again");
+	            }
+	        }
+    	}
+    }
+    
     private String compile(File f) {
 		String filename = f.getPath();
 		String cmdString	= "../henos-automata/src/cltsa -r " + filename;
