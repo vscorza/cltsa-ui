@@ -28,14 +28,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.io.*;
 
-/**
- * The layout window to display machines according to layout algorithms
- *
- * @author Cédric Delforge
- */
+
 @SuppressWarnings("serial")
 public class ExperimentJUNGLayoutWindow extends JSplitPane{
     ExperimentJUNGCanvas output; //the panel where all the machines are drawn
+    JTabbedPane tabbedPane;
+    String lastOpenedFile = "";
 
     EnumLayout layout = EnumLayout.FruchtermanReingold; //current layout selected
     int[] lastEvent, prevEvent; //last event received, event before that one
@@ -88,6 +86,37 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         JPanel canvasTools = new JPanel(new BorderLayout());
         canvasTools.add("Center", output);
+        
+        JPanel editingPanel = new JPanel(new BorderLayout());
+        JTextArea editingArea = new JTextArea();
+        Font font = new Font("Courier New", Font.PLAIN, 11);
+        editingArea.setFont(font);
+        editingArea.setBackground(Color.BLACK);
+        editingArea.setForeground(Color.WHITE);
+        JScrollPane editingPane;
+        //scrollable list pane
+        editingPane = new JScrollPane(editingArea,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        editingPane.setPreferredSize(new Dimension(editingPane.getPreferredSize().width, 100));        
+        editingPanel.add("Center", editingPane);
+        
+        tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("Editor", editingPanel);
+        tabbedPane.addTab("Visualization", canvasTools);
+        
+        infoText			= new JTextPane();
+        infoText.setContentType("text/html");
+        infoText.setText("<html><b>[Status pending]</b></html>");
+        JScrollPane southPane;
+        //scrollable list pane
+        southPane = new JScrollPane(infoText,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        southPane.setPreferredSize(new Dimension(southPane.getPreferredSize().width, 100));
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.add("Center", tabbedPane);
+        mainPanel.add("South",southPane);
         
 
         ArrayList<EnumLayout> layoutTypes = new ArrayList<EnumLayout>();
@@ -207,17 +236,8 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
         layoutControls.setFloatable(false);
         canvasTools.add("North", layoutControls);
         
-      
-        infoText			= new JTextPane();
-        infoText.setContentType("text/html");
-        infoText.setText("<html><b>[Status pending]</b></html>");
-        JScrollPane southPane;
-        //scrollable list pane
-        southPane = new JScrollPane(infoText,
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        southPane.setPreferredSize(new Dimension(southPane.getPreferredSize().width, 100));
-        canvasTools.add("South",southPane);
+		JFileChooser chooser = new JFileChooser();
+		chooser.setPreferredSize(new Dimension(800, 600));
         
         JPanel leftPanel	= new JPanel(new BorderLayout());
         JPanel innerLeftPanel	= new JPanel(new GridBagLayout());
@@ -225,14 +245,13 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
         gbc.weightx = 1;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridwidth = GridBagConstraints.REMAINDER;
-       
-        JButton runButton	= new JButton("Run Spec");
-        runButton.addActionListener(new ActionListener() {
+        
+        JButton openButton	= new JButton("Open FSP");
+        openButton.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				JFileChooser chooser = new JFileChooser();
 				chooser.setCurrentDirectory(new File("../henos-automata/src/tests"));
 				chooser.setMultiSelectionEnabled(false);
 				chooser.setFileFilter(new FileFilter() {
@@ -249,50 +268,17 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 				if (r == JFileChooser.APPROVE_OPTION) {
 					try {
 						infoText.setText("");
+						editingArea.setText("");
 						String s, s2 = "";
 						File f	= chooser.getSelectedFile();
 						String filename = f.getPath();
-						String cmdString	= "../henos-automata/src/cltsa -r " + filename;
-						s2+= "Running the following command: " + cmdString + "\n";
-			            Process p = Runtime.getRuntime().exec(cmdString);
-			            BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-						BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-						s2+="Here is the standard output of the command:\n";
-
-						while ((s = stdInput.readLine()) != null) {
-							s2+=s;
-						}
-						s2.concat("Here is the standard error of the command (if any):\n");
-						while ((s = stdError.readLine()) != null) {
-							s2+=s;
-						}
-						System.out.println(s2);
-						infoText.setText(s2);
-				        File directory = new File("/tmp");
-				        File[] fileList = directory.listFiles(new FilenameFilter() {
-							
-							@Override
-							public boolean accept(File f, String name) {
-								return name.toLowerCase().endsWith(".rep");
-							}
-						});
-						try {
-							int fileCount	= fileList.length;
-							sm				= new ReportAutomaton[fileCount];
-							fileCount		= 0;
-							for(File f2: fileList) {
-								filename = f2.getPath();
-								FileInputStream is;
-									is = new FileInputStream(f2);
-								
-								sm[fileCount++]	= new ReportAutomaton(new PushbackInputStream(is));
-							}
-						} catch (FileNotFoundException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}					
-				        new_machines();
+						lastOpenedFile	= filename;
+						BufferedReader br = new BufferedReader(new FileReader(f)); 
+						while ((s = br.readLine()) != null) { 
+							s2 += s + "\n"; 
+						} 						
+						editingArea.setText(s2);
+						tabbedPane.setSelectedIndex(0);
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -301,14 +287,115 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 			}
 
 		});
+        innerLeftPanel.add(openButton, gbc);  
+        JButton saveFSPButton	= new JButton("Save FSP");
+        saveFSPButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(lastOpenedFile.trim().length() < 1)return;
+				try {
+					infoText.setText("");
+					String s, s2 = "";
+					File f = new File(lastOpenedFile);
+					FileWriter fw = new FileWriter(f.getAbsoluteFile(), true);
+					editingArea.write(fw);
+					fw.close();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}									
+			}
+
+		});
+        innerLeftPanel.add(saveFSPButton, gbc);  
+        JButton saveFSPAsButton	= new JButton("Save FSP As...");
+        saveFSPAsButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					infoText.setText("");
+					chooser.setCurrentDirectory(new File("../henos-automata/src/tests"));
+					chooser.setMultiSelectionEnabled(false);
+					chooser.setFileFilter(new FileFilter() {
+						public boolean accept(File f) {
+							return f.getName().toLowerCase().endsWith(".fsp")
+							|| f.isDirectory();
+						}
+						
+						public String getDescription() {
+						return "FSP Files";
+						}
+					});
+					int r = chooser.showOpenDialog(frame);
+					if (r == JFileChooser.APPROVE_OPTION) {
+						lastOpenedFile = chooser.getSelectedFile().getPath();
+					}else return;
+					
+					String s, s2 = "";
+					File f = new File(lastOpenedFile);
+					FileWriter fw = new FileWriter(f.getAbsoluteFile(), true);
+					editingArea.write(fw);
+					fw.close();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}									
+			}
+
+		});
+        innerLeftPanel.add(saveFSPAsButton, gbc);  
+
+        JButton runButton	= new JButton("Compile");
+        runButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+					try {
+						File f = new File("/tmp/current_cltsa_editor_file.tmpfsp");
+						FileWriter fw = new FileWriter(f.getAbsoluteFile(), false);
+						editingArea.write(fw);
+						fw.close();
+						infoText.setText(compile(f));
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}					
+			}
+
+		});
         innerLeftPanel.add(runButton, gbc);        
-        JButton fileButton	= new JButton("Open File");
+
+        JButton compileButton	= new JButton("Compile from File");
+        compileButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				chooser.setCurrentDirectory(new File("../henos-automata/src/tests"));
+				chooser.setMultiSelectionEnabled(false);
+				chooser.setFileFilter(new FileFilter() {
+					public boolean accept(File f) {
+						return f.getName().toLowerCase().endsWith(".fsp")
+						|| f.isDirectory();
+					}
+					
+					public String getDescription() {
+					return "FSP Files";
+					}
+				});
+				int r = chooser.showOpenDialog(frame);
+				if (r == JFileChooser.APPROVE_OPTION) {
+					infoText.setText(compile(chooser.getSelectedFile()));
+				}
+			}
+
+		});
+        innerLeftPanel.add(compileButton, gbc);        
+        JButton fileButton	= new JButton("Open Reports");
         fileButton.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				JFileChooser chooser = new JFileChooser();
 				chooser.setCurrentDirectory(new File("../henos-automata/src/results"));
 				chooser.setMultiSelectionEnabled(true);
 				chooser.setFileFilter(new FileFilter() {
@@ -316,7 +403,6 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 						return f.getName().toLowerCase().endsWith(".rep")
 						|| f.isDirectory();
 					}
-					
 					public String getDescription() {
 					return "REP Files";
 					}
@@ -335,7 +421,6 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 							sm[fileCount++]	= new ReportAutomaton(new PushbackInputStream(is));
 						}
 					} catch (FileNotFoundException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}					
 			        new_machines();
@@ -344,17 +429,73 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 
 		});
         innerLeftPanel.add(fileButton, gbc);
+        innerLeftPanel.add(new JLabel("Reports"), gbc);
         leftPanel.add("North", innerLeftPanel);
         leftPanel.add("Center", left);
         
         setLeftComponent(leftPanel);
-        setRightComponent(canvasTools);
+        setRightComponent(mainPanel);
         setDividerLocation(200);
         setBigFont(fontFlag);
         validate();
 
     }
 
+    private String compile(File f) {
+    	String s = "", s2 = "";
+		String filename = f.getPath();
+		String cmdString	= "../henos-automata/src/cltsa -r " + filename;
+		s2+= "Running the following command: " + cmdString + "\n";
+		try {		
+	        Process p = Runtime.getRuntime().exec(cmdString);
+	        BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+	
+			BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+			s2+="Here is the standard output of the command:\n";
+	
+			while ((s = stdInput.readLine()) != null) {
+				s2+=s;
+			}
+			s2.concat("Here is the standard error of the command (if any):\n");
+			while ((s = stdError.readLine()) != null) {
+				s2+=s;
+			}
+	    	return s2+=openReports();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return e1.getMessage();
+		}	
+    }
+    
+    private String openReports() {
+        File directory = new File("/tmp");
+        File[] fileList = directory.listFiles(new FilenameFilter() {
+			
+			@Override
+			public boolean accept(File f, String name) {
+				return name.toLowerCase().endsWith(".rep");
+			}
+		});
+		try {
+			int fileCount	= fileList.length;
+			sm				= new ReportAutomaton[fileCount];
+			fileCount		= 0;
+			for(File f2: fileList) {
+				FileInputStream is;
+					is = new FileInputStream(f2.getPath());
+				
+				sm[fileCount++]	= new ReportAutomaton(new PushbackInputStream(is));
+			}
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return e1.getMessage();
+		}					
+        new_machines();
+        return "";
+    }
+    
     private ImageIcon getDrawIcon() {
     	return null;
     	/*
@@ -449,6 +590,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
                 }
                 list.clearSelection();
             }
+            tabbedPane.setSelectedIndex(1);
         }
     }
 
