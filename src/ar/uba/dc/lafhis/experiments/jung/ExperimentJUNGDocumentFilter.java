@@ -68,7 +68,7 @@ public class ExperimentJUNGDocumentFilter extends DocumentFilter {
     private void setDefaultAttributes(SimpleAttributeSet attrSet) {
     	StyleConstants.setBackground(attrSet, Color.BLACK);
     	StyleConstants.setFontFamily(attrSet, "Courier New");
-    	StyleConstants.setFontSize(attrSet, 12);
+    	StyleConstants.setFontSize(attrSet, 14);
     }
     
     @Override
