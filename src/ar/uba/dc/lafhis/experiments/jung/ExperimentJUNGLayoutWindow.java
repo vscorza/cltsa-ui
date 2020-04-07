@@ -150,12 +150,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
         visualizationText	= new JTextPane();
         visualizationText.setContentType("text/html");
         visualizationText.setText(infoText.getText());
-        
-        DefaultCaret caret = (DefaultCaret) infoText.getCaret();
-        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-        caret = (DefaultCaret) visualizationText.getCaret();
-        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-        
+                
         JScrollPane editorSouthPane = new JScrollPane(infoText, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         editorSouthPane.setPreferredSize(new Dimension(editorSouthPane.getPreferredSize().width, 150));

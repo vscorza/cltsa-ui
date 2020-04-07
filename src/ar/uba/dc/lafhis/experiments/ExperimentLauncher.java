@@ -2,10 +2,12 @@ package ar.uba.dc.lafhis.experiments;
 
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -63,7 +65,11 @@ public class ExperimentLauncher {
 		frame.setUndecorated(true);
 		frame.setVisible(true);
 		frame.getContentPane().add(new ExperimentJUNGLayoutWindow());
-		frame.setVisible(true); 
+		frame.setVisible(true);
+		URL url = ClassLoader.getSystemResource("ar/uba/dc/lafhis/experiments/logo.png");
+		Toolkit kit = Toolkit.getDefaultToolkit();
+		Image img = kit.createImage(url);
+		frame.setIconImage(img);
 	}
 
 }
