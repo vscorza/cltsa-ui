@@ -38,7 +38,7 @@ public class ExperimentJUNGDocumentFilter extends DocumentFilter {
     	styledDocument	= pane.getStyledDocument();
     	keywordPattern 	= buildKeywordPattern();
     	commentPattern	= Pattern.compile("/\\*.*\\n.*\\*\\/|/\\*.*\\*\\/|//.*");
-    	operatorsPattern= Pattern.compile("\\{|\\}|<|>|\\.|\\(|\\)|-|=|,|\\|\\||\\|f\\||\\|gr1\\|");    	
+    	operatorsPattern= Pattern.compile("\\{|\\}|<|>|\\.|\\(|\\)|-|=|,|\\|\\||\\|f\\||\\|gr1\\||\\[\\]|!|\\bX\\b");    	
     	
         styleContext = StyleContext.getDefaultStyleContext();
         keywordAttributeSet = new SimpleAttributeSet();
@@ -52,7 +52,7 @@ public class ExperimentJUNGDocumentFilter extends DocumentFilter {
         
         StyleConstants.setForeground(defaultAttributeSet, new Color(238,232,213));
         StyleConstants.setForeground(keywordAttributeSet, new Color(211,54,130));//magenta
-        StyleConstants.setForeground(commentAttributeSet, Color.LIGHT_GRAY);
+        StyleConstants.setForeground(commentAttributeSet, Color.GRAY);
         StyleConstants.setForeground(operatorsAttributeSet, new Color(203,75,22));//orange
 	}
     
@@ -125,13 +125,13 @@ public class ExperimentJUNGDocumentFilter extends DocumentFilter {
         while (matcher.find()) {
             styledDocument.setCharacterAttributes(matcher.start(), matcher.end() - matcher.start(), keywordAttributeSet, false);
         }
-        matcher = commentPattern.matcher(pane.getText());
-        while (matcher.find()) {
-            styledDocument.setCharacterAttributes(matcher.start(), matcher.end() - matcher.start(), commentAttributeSet, false);
-        }
         matcher = operatorsPattern.matcher(pane.getText());
         while (matcher.find()) {
             styledDocument.setCharacterAttributes(matcher.start(), matcher.end() - matcher.start(), operatorsAttributeSet, false);
         }
+        matcher = commentPattern.matcher(pane.getText());
+        while (matcher.find()) {
+            styledDocument.setCharacterAttributes(matcher.start(), matcher.end() - matcher.start(), commentAttributeSet, false);
+        }        
     }
 }
