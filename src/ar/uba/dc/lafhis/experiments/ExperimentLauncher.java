@@ -1,6 +1,7 @@
 package ar.uba.dc.lafhis.experiments;
 
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -9,7 +10,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
+import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.Painter;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
@@ -38,6 +41,13 @@ public class ExperimentLauncher {
 		    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 		        if ("Nimbus".equals(info.getName())) {
 		            UIManager.setLookAndFeel(info.getClassName());
+		            UIManager.put("TextPane[Enabled].backgroundPainter", new Painter<JComponent>() {
+		                @Override
+		                public void paint(Graphics2D g, JComponent comp, int width, int height) {
+		                    g.setColor(comp.getBackground());
+		                    g.fillRect(0, 0, width, height);
+		                }
+		            });		            
 		            break;
 		        }
 		    }

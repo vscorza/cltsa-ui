@@ -6,10 +6,14 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.plaf.ColorUIResource;
+import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 
 import ar.uba.dc.lafhis.experiments.jung.ExperimentJUNGCanvas.EnumLayout;
 import ar.uba.dc.lafhis.experiments.jung.ExperimentJUNGCanvas.EnumMode;
@@ -74,7 +78,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
     JTextField searchField;
     JTextField replaceField;
     JCheckBox caseSensitiveCheckBox;
-    JTextArea editingArea;
+    JTextPane editingArea;
     Highlighter.HighlightPainter painter;
     
     ImageIcon drawIcon;
@@ -100,18 +104,19 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
         canvasTools.add("Center", output);
         
         JPanel editingPanel = new JPanel(new BorderLayout());
-        editingArea = new JTextArea();
-        Font font = new Font("Courier New", Font.PLAIN, 11);
-        editingArea.setFont(font);
+        
+        editingArea = new JTextPane();
+        ((AbstractDocument) editingArea.getDocument()).setDocumentFilter(new ExperimentJUNGDocumentFilter(editingArea));
         editingArea.setBackground(Color.BLACK);
-        editingArea.setForeground(Color.WHITE);
+        
         JScrollPane editingPane;
-        //scrollable list pane
         editingPane = new JScrollPane(editingArea,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        editingPane.setPreferredSize(new Dimension(editingPane.getPreferredSize().width, 100));        
+        editingPane.setPreferredSize(new Dimension(editingPane.getPreferredSize().width, 100));
+        editingPane.setBackground(Color.BLACK);
         editingPanel.add("Center", editingPane);
+
         
         painter = new DefaultHighlighter.DefaultHighlightPainter(Color.orange);
 
