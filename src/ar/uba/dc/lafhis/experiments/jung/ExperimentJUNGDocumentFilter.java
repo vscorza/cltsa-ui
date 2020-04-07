@@ -24,7 +24,9 @@ public class ExperimentJUNGDocumentFilter extends DocumentFilter {
     private final SimpleAttributeSet keywordAttributeSet;
     private final SimpleAttributeSet defaultAttributeSet;
     private final SimpleAttributeSet commentAttributeSet;
+    private final SimpleAttributeSet enclosureAttributeSet;
     private final SimpleAttributeSet operatorsAttributeSet;
+    
 
     private static String[] KEYWORDS = {"fluent","set","range","const","when","initially","ltl","env","sys","rho","theta","in","order","equals"};
     
@@ -32,27 +34,34 @@ public class ExperimentJUNGDocumentFilter extends DocumentFilter {
     private Pattern keywordPattern;
     private Pattern commentPattern;
     private Pattern operatorsPattern;
+    private Pattern enclosurePattern;
 
     public ExperimentJUNGDocumentFilter(JTextPane pane) {
     	this.pane		= pane;
     	styledDocument	= pane.getStyledDocument();
     	keywordPattern 	= buildKeywordPattern();
     	commentPattern	= Pattern.compile("/\\*.*\\n.*\\*\\/|/\\*.*\\*\\/|//.*");
-    	operatorsPattern= Pattern.compile("\\{|\\}|<|>|\\.|\\(|\\)|-|=|,|\\|\\||\\|f\\||\\|gr1\\||\\[\\]|!|\\bX\\b");    	
+    	enclosurePattern= Pattern.compile("-\\>|\\||\\{|\\}|\\<|\\>|\\.|\\(|\\)");
+    	operatorsPattern= Pattern.compile("-[^\\>]|\\+|\\*|=|,|\\|\\||\\|f\\||\\|gr1\\||\\[\\]|!|\\bX\\b|&&");    	
     	
         styleContext = StyleContext.getDefaultStyleContext();
         keywordAttributeSet = new SimpleAttributeSet();
         commentAttributeSet = new SimpleAttributeSet();
         defaultAttributeSet = new SimpleAttributeSet();
+        enclosureAttributeSet	= new SimpleAttributeSet();
         operatorsAttributeSet	= new SimpleAttributeSet();
+        
         setDefaultAttributes(keywordAttributeSet);
         setDefaultAttributes(commentAttributeSet);
         setDefaultAttributes(defaultAttributeSet);
+        setDefaultAttributes(enclosureAttributeSet);
         setDefaultAttributes(operatorsAttributeSet);
         
         StyleConstants.setForeground(defaultAttributeSet, new Color(238,232,213));
         StyleConstants.setForeground(keywordAttributeSet, new Color(211,54,130));//magenta
-        StyleConstants.setForeground(commentAttributeSet, Color.GRAY);
+        StyleConstants.setForeground(commentAttributeSet, new Color(100,133,50));//green
+        StyleConstants.setFontFamily(commentAttributeSet, "Lucida Console");
+        StyleConstants.setForeground(enclosureAttributeSet, new Color(42,161,152));//cyan
         StyleConstants.setForeground(operatorsAttributeSet, new Color(203,75,22));//orange
 	}
     
@@ -125,6 +134,10 @@ public class ExperimentJUNGDocumentFilter extends DocumentFilter {
         while (matcher.find()) {
             styledDocument.setCharacterAttributes(matcher.start(), matcher.end() - matcher.start(), keywordAttributeSet, false);
         }
+        matcher = enclosurePattern.matcher(pane.getText());
+        while (matcher.find()) {
+            styledDocument.setCharacterAttributes(matcher.start(), matcher.end() - matcher.start(), enclosureAttributeSet, false);
+        }   
         matcher = operatorsPattern.matcher(pane.getText());
         while (matcher.find()) {
             styledDocument.setCharacterAttributes(matcher.start(), matcher.end() - matcher.start(), operatorsAttributeSet, false);
