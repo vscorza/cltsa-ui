@@ -1,9 +1,12 @@
 package ar.uba.dc.lafhis.experiments;
 
+import java.awt.AWTException;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.SystemTray;
 import java.awt.Toolkit;
+import java.awt.TrayIcon;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
@@ -62,7 +65,7 @@ public class ExperimentLauncher {
 		//Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		//frame.setSize(new Dimension(screenSize.width - 200, screenSize.height - 200));
 		frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
-		frame.setUndecorated(true);
+		//frame.setUndecorated(true);
 		frame.setVisible(true);
 		frame.getContentPane().add(new ExperimentJUNGLayoutWindow());
 		frame.setVisible(true);

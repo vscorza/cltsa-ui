@@ -90,6 +90,8 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 
         output = new ExperimentJUNGCanvas();
 
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        
         Container frame	= this.getParent();
         JScrollPane left;
         //scrollable list pane
@@ -100,10 +102,12 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
         left = new JScrollPane(list,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        JPanel canvasTools = new JPanel(new BorderLayout());
-        canvasTools.add("Center", output);
+        JSplitPane canvasTools = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        JPanel outputPanel	= new JPanel(new BorderLayout());
+        canvasTools.setTopComponent(outputPanel);
+        outputPanel.add("Center",output);
         
-        JPanel editingPanel = new JPanel(new BorderLayout());
+        JSplitPane editingPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         
         editingArea = new JTextPane();
         ((AbstractDocument) editingArea.getDocument()).setDocumentFilter(new ExperimentJUNGDocumentFilter(editingArea));
@@ -115,7 +119,9 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         editingPane.setPreferredSize(new Dimension(editingPane.getPreferredSize().width, 100));
         editingPane.setBackground(Color.BLACK);
-        editingPanel.add("Center", editingPane);
+        JPanel editingTop	= new JPanel(new BorderLayout());
+        editingTop.add("Center", editingPane);
+        editingPanel.setTopComponent(editingTop);
 
         
         painter = new DefaultHighlighter.DefaultHighlightPainter(Color.orange);
@@ -143,23 +149,25 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
         searchPanel.add(replaceAllButton);
         replaceAllButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent arg0) {searchReplace(false, true);}});
         searchPanel.setPreferredSize(new Dimension(searchPanel.getPreferredSize().width, 40));
-        editingPanel.add("North", searchPanel);
+        editingTop.add("North", searchPanel);
         infoText			= new JTextPane();
         infoText.setContentType("text/html");
-        infoText.setText("Welcome to the <font color='blue'><b>C</b>oncurrent <b>L</b>abeled <b>T</b>ransition <b>S</b>ystem <b>A</b>nalyzer</font>.<br>Feel free to contact me at <a href='mailto:vscorza@gmail.com'>vscorza@gmail.com</a><br><b>[Status pending]</b></html>");
+        infoText.setText("Welcome to the <font color='blue'><b>C</b>oncurrent <b>L</b>abelled <b>T</b>ransition <b>S</b>ystem <b>A</b>nalyzer</font>.<br>Feel free to contact me at <a href='mailto:vscorza@gmail.com'>vscorza@gmail.com</a><br><b>[Status pending]</b></html>");
         visualizationText	= new JTextPane();
         visualizationText.setContentType("text/html");
         visualizationText.setText(infoText.getText());
-                
+        infoText.setBackground(Color.WHITE);
         JScrollPane editorSouthPane = new JScrollPane(infoText, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         editorSouthPane.setPreferredSize(new Dimension(editorSouthPane.getPreferredSize().width, 150));
-        editingPanel.add("South", editorSouthPane);
-        
+        editingPanel.setBottomComponent(editorSouthPane);
+        editingPanel.setDividerLocation(screenSize.height - 150);
+        visualizationText.setBackground(Color.WHITE);
         JScrollPane visualizationSouthPane = new JScrollPane(visualizationText, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         visualizationSouthPane.setPreferredSize(new Dimension(visualizationSouthPane.getPreferredSize().width, 150));
-        canvasTools.add("South", visualizationSouthPane);
+        canvasTools.setBottomComponent(visualizationSouthPane);
+        canvasTools.setDividerLocation(screenSize.height - 150);
         
         tabbedPane = new JTabbedPane();
         
@@ -285,7 +293,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
         layoutControls.add(loadButton);
 
         layoutControls.setFloatable(false);
-        canvasTools.add("North", layoutControls);
+        outputPanel.add("North", layoutControls);
         
 		JFileChooser chooser = new JFileChooser();
 		chooser.setPreferredSize(new Dimension(950, 600));

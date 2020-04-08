@@ -119,7 +119,6 @@ public class ExperimentJUNGDocumentFilter extends DocumentFilter {
             sb.append("\\b");
         }
 
-        System.out.println(sb.toString());
         Pattern p = Pattern.compile(sb.toString());
 
         return p;
