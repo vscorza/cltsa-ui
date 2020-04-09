@@ -3,6 +3,8 @@ package ar.uba.dc.lafhis.experiments.jung;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
@@ -79,6 +81,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
     JTextField replaceField;
     JCheckBox caseSensitiveCheckBox;
     JTextPane editingArea;
+    JProgressBar compileProgress;
     Highlighter.HighlightPainter painter;
     
     ImageIcon drawIcon;
@@ -124,8 +127,9 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
         editingPanel.setTopComponent(editingTop);
 
         
-        painter = new DefaultHighlighter.DefaultHighlightPainter(Color.orange);
+        painter = new DefaultHighlighter.DefaultHighlightPainter(new Color(100, 55, 0));
 
+        JPanel searchContainer = new JPanel(new BorderLayout());
         JPanel searchPanel	= new JPanel(new FlowLayout());
         searchPanel.add(new JLabel("Search:"));
         searchField	= new JTextField(30);
@@ -148,8 +152,19 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
         JButton replaceAllButton = new JButton("Replace All");
         searchPanel.add(replaceAllButton);
         replaceAllButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent arg0) {searchReplace(false, true);}});
-        searchPanel.setPreferredSize(new Dimension(searchPanel.getPreferredSize().width, 40));
-        editingTop.add("North", searchPanel);
+        searchContainer.add("West", searchPanel);
+        JPanel compilePanel = new JPanel(new BorderLayout());
+        compileProgress	= new JProgressBar(JProgressBar.HORIZONTAL);
+        compileProgress.setPreferredSize(new Dimension(50, 15));
+        Border blackline = BorderFactory.createLineBorder(Color.GRAY);
+        Border titledBorder = BorderFactory.createTitledBorder(blackline, "Progress",TitledBorder.DEFAULT_JUSTIFICATION,
+        		TitledBorder.TOP, new Font("Courier New", Font.PLAIN, 9));
+        compilePanel.setBorder(titledBorder);
+        compilePanel.add("Center", compileProgress);
+        compilePanel.setPreferredSize(new Dimension(compilePanel.getPreferredSize().width, 20));
+        searchContainer.add("East",compilePanel);
+        searchContainer.setPreferredSize(new Dimension(searchPanel.getPreferredSize().width, 40));
+        editingTop.add("North", searchContainer);
         infoText			= new JTextPane();
         infoText.setContentType("text/html");
         infoText.setText("Welcome to the <font color='blue'><b>C</b>oncurrent <b>L</b>abelled <b>T</b>ransition <b>S</b>ystem <b>A</b>nalyzer</font>.<br>Feel free to contact me at <a href='mailto:vscorza@gmail.com'>vscorza@gmail.com</a><br><b>[Status pending]</b></html>");
@@ -547,41 +562,45 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 		String cmdString	= "../henos-automata/src/cltsa -r " + filename;
 		String s3 = "Running the following command: <i>" + cmdString + "</i><br>";
 		infoText.setText(s3);
+		compileProgress.setIndeterminate(true);
 		Thread cmdThread = new Thread() {
 			public void run() {
 				try {
 					String s = "", s2 = "";
 
-				Process p = Runtime.getRuntime().exec(cmdString);
-		        BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-		
-				BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-				
-				boolean hasStd = false;
-				while ((s = stdInput.readLine()) != null) {
-					if(!hasStd) {
-						s2+="<b>Here is the standard output of the command:</b><br>";
-						hasStd = true;
+					Process p = Runtime.getRuntime().exec(cmdString);
+			        BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			
+					BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+					
+					boolean hasStd = false;
+					while ((s = stdInput.readLine()) != null) {
+						if(!hasStd) {
+							s2+="<b>Here is the standard output of the command:</b><br>";
+							hasStd = true;
+						}
+						s2+=s + "<br>";
+						infoText.setText(s2);
 					}
-					s2+=s + "<br>";
-					infoText.setText(s2);
-				}
-				boolean hasError = false;
-				
-				while ((s = stdError.readLine()) != null) {
-					if(!hasError) {
-						s2+= "Here is the standard error of the command (if any):\n";
-						hasError = true;
+					boolean hasError = false;
+					
+					while ((s = stdError.readLine()) != null) {
+						if(!hasError) {
+							s2+= "Here is the standard error of the command (if any):\n";
+							hasError = true;
+						}
+						s2+=s + "<br>";
+						infoText.setText(s2);
 					}
-					s2+=s + "<br>";
-					infoText.setText(s2);
-				}
-		    	s2+=openReports();
-		    	infoText.setText(s2);
-					} catch (IOException e1) {
+			    	s2+=openReports();
+			    	infoText.setText(s2);
+				} catch (IOException e1) {
 						e1.printStackTrace();
-					}	
-				}
+				}	
+		    	compileProgress.setIndeterminate(false); 
+		    	compileProgress.setString(null);
+		    	compileProgress.setValue(0);
+			}
 		};
 		cmdThread.setDaemon(true);
 		cmdThread.start();
