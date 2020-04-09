@@ -75,6 +75,8 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
     Font f3 = new Font("SansSerif", Font.PLAIN, 12);
     Font f4 = new Font("SansSerif", Font.BOLD, 16);
 
+    ArrayList<JButton> activeButtons;
+    
     JTextPane infoText;
     JTextPane visualizationText;
     JTextField searchField;
@@ -327,11 +329,19 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
         JButton compileButton	= new JButton("Compile from File");
         JButton fileButton	= new JButton("Open Reports");
         
+        activeButtons	= new ArrayList<JButton>();
+        activeButtons.add(openButton);
+        activeButtons.add(saveFSPAsButton);
+        activeButtons.add(saveFSPButton);
+        activeButtons.add(runButton);
+        activeButtons.add(compileButton);
+        activeButtons.add(fileButton);
         
         openButton.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				editingArea.getHighlighter().removeAllHighlights();
 				// TODO Auto-generated method stub
 				chooser.setCurrentDirectory(new File("../henos-automata/src/tests"));
 				chooser.setMultiSelectionEnabled(false);
@@ -373,6 +383,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				editingArea.getHighlighter().removeAllHighlights();
 				if(lastOpenedFile.trim().length() < 1)return;
 				try {
 					infoText.setText("");
@@ -392,6 +403,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				editingArea.getHighlighter().removeAllHighlights();
 				try {
 					infoText.setText("");
 					chooser.setCurrentDirectory(new File("../henos-automata/src/tests"));
@@ -531,6 +543,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
     }
 
     private void searchReplace(boolean isSearch, boolean isAll) {
+    	editingArea.getHighlighter().removeAllHighlights();
     	if(!isSearch) {
     		String prefix = caseSensitiveCheckBox.isSelected()? "(?i)" : "";
     		if(isAll) {
@@ -558,6 +571,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
     }
     
     private String compile(File f) {
+    	editingArea.getHighlighter().removeAllHighlights();
 		String filename = f.getPath();
 		String cmdString	= "../henos-automata/src/cltsa -r " + filename;
 		String s3 = "Running the following command: <i>" + cmdString + "</i><br>";
@@ -565,6 +579,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 		compileProgress.setIndeterminate(true);
 		Thread cmdThread = new Thread() {
 			public void run() {
+				for(JButton b: activeButtons)b.setEnabled(false);
 				try {
 					String s = "", s2 = "";
 
@@ -600,6 +615,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 		    	compileProgress.setIndeterminate(false); 
 		    	compileProgress.setString(null);
 		    	compileProgress.setValue(0);
+		    	for(JButton b: activeButtons)b.setEnabled(true);
 			}
 		};
 		cmdThread.setDaemon(true);
@@ -608,6 +624,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
     }
     
     private String openReports() {
+    	editingArea.getHighlighter().removeAllHighlights();
         File directory = new File("/tmp");
         File[] fileList = directory.listFiles(new FilenameFilter() {
 			
