@@ -46,6 +46,8 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
     ExperimentJUNGCanvas output; //the panel where all the machines are drawn
     JTabbedPane tabbedPane;
     String lastOpenedFile = "";
+    
+    static int MAX_CHAR_OUTPUT = 10000;
 
     EnumLayout layout = EnumLayout.FruchtermanReingold; //current layout selected
     int[] lastEvent, prevEvent; //last event received, event before that one
@@ -580,6 +582,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 		Thread cmdThread = new Thread() {
 			public void run() {
 				for(JButton b: activeButtons)b.setEnabled(false);
+				int localLineCount = 0;
 				try {
 					String s = "", s2 = "";
 
@@ -595,7 +598,15 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 							hasStd = true;
 						}
 						s2+=s + "<br>";
-						infoText.setText(s2);
+						localLineCount++;
+						if(localLineCount > 100) {
+							if(s2.length() < MAX_CHAR_OUTPUT)
+								infoText.setText(s2);
+							else
+								infoText.setText("Output is " + s2.length() + " characters long");
+							localLineCount	= 0;
+						}
+						
 					}
 					boolean hasError = false;
 					
@@ -605,10 +616,28 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 							hasError = true;
 						}
 						s2+=s + "<br>";
-						infoText.setText(s2);
+						localLineCount++;
+						if(localLineCount > 100) {					
+							if(s2.length() < MAX_CHAR_OUTPUT)
+								infoText.setText(s2);
+							else
+								infoText.setText("Output is " + s2.length() + " characters long");
+							localLineCount = 0;
+						}
 					}
 			    	s2+=openReports();
-			    	infoText.setText(s2);
+			    	if(s2.length() < MAX_CHAR_OUTPUT) {
+						infoText.setText(s2 + "<br><b>Output was " + s2.length() + " characters long, saved to /tmp/current_cltsa_editor_file_output.html</b>");
+			    	}else {
+						infoText.setText("<b>Output was " + s2.length() + " characters long, saved to /tmp/current_cltsa_editor_file_output.html</b>");	
+			    	}
+			    		
+					File f = new File("/tmp/current_cltsa_editor_file_output.html");
+					FileWriter fw = new FileWriter(f.getAbsoluteFile(), false);
+					fw.write(s2);
+
+					fw.close();
+				
 				} catch (IOException e1) {
 						e1.printStackTrace();
 				}	
