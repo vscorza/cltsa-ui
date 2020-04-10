@@ -62,8 +62,8 @@ public class ExperimentLauncher {
 		
 		JFrame frame = new JFrame("CLTSA (Alpha)");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		//Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		//frame.setSize(new Dimension(screenSize.width - 200, screenSize.height - 200));
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		frame.setSize(new Dimension(screenSize.width - 200, screenSize.height - 200));
 		frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
 		//frame.setUndecorated(true);
 		frame.setVisible(true);
