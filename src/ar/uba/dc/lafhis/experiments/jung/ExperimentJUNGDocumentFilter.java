@@ -43,8 +43,8 @@ public class ExperimentJUNGDocumentFilter extends DocumentFilter {
     	keywordPattern 	= buildKeywordPattern();
     	commentPattern	= Pattern.compile("\\/\\*.*?\\*\\/", Pattern.DOTALL);
     	singleLineCommentPattern = Pattern.compile("//.*");
-    	enclosurePattern= Pattern.compile("-\\>|\\||\\{|\\}|\\<|\\>|\\.|\\(|\\)");
-    	operatorsPattern= Pattern.compile("-[^\\>]|\\+|\\*|=|,|\\|\\||\\|f\\||\\|gr1\\||\\[\\]|!|\\bX\\b|&&");    	
+    	enclosurePattern= Pattern.compile("\\||\\{|\\}|\\<|\\>|\\.|\\(|\\)");
+    	operatorsPattern= Pattern.compile("-\\>|-|\\<-\\>|\\+|\\*|=|,|\\|\\||\\|f\\||\\|gr1\\||\\[\\]|!|\\bX\\b|&&");    	
     	
         styleContext = StyleContext.getDefaultStyleContext();
         keywordAttributeSet = new SimpleAttributeSet();
