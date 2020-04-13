@@ -35,12 +35,14 @@ public class ExperimentJUNGDocumentFilter extends DocumentFilter {
     private Pattern commentPattern;
     private Pattern operatorsPattern;
     private Pattern enclosurePattern;
+    private Pattern singleLineCommentPattern;
 
     public ExperimentJUNGDocumentFilter(JTextPane pane) {
     	this.pane		= pane;
     	styledDocument	= pane.getStyledDocument();
     	keywordPattern 	= buildKeywordPattern();
-    	commentPattern	= Pattern.compile("/\\*.*\\n.*\\*\\/|/\\*.*\\*\\/|//.*");
+    	commentPattern	= Pattern.compile("\\/\\*.*?\\*\\/", Pattern.DOTALL);
+    	singleLineCommentPattern = Pattern.compile("//.*");
     	enclosurePattern= Pattern.compile("-\\>|\\||\\{|\\}|\\<|\\>|\\.|\\(|\\)");
     	operatorsPattern= Pattern.compile("-[^\\>]|\\+|\\*|=|,|\\|\\||\\|f\\||\\|gr1\\||\\[\\]|!|\\bX\\b|&&");    	
     	
@@ -144,6 +146,11 @@ public class ExperimentJUNGDocumentFilter extends DocumentFilter {
         matcher = commentPattern.matcher(pane.getText());
         while (matcher.find()) {
             styledDocument.setCharacterAttributes(matcher.start(), matcher.end() - matcher.start(), commentAttributeSet, false);
+        }
+        matcher = singleLineCommentPattern.matcher(pane.getText());
+        while (matcher.find()) {
+            styledDocument.setCharacterAttributes(matcher.start(), matcher.end() - matcher.start(), commentAttributeSet, false);
         }        
+        
     }
 }

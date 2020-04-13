@@ -46,6 +46,8 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
     ExperimentJUNGCanvas output; //the panel where all the machines are drawn
     JTabbedPane tabbedPane;
     String lastOpenedFile = "";
+    JFrame currentFrame;
+    String currentFrameInitialTitle;
     
     static int MAX_CHAR_OUTPUT = 10000;
 
@@ -90,16 +92,18 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
     
     ImageIcon drawIcon;
 
-    public ExperimentJUNGLayoutWindow() {
+    public ExperimentJUNGLayoutWindow(JFrame currentFrame) {
 
         super();
         drawIcon = getDrawIcon();
+
 
         output = new ExperimentJUNGCanvas();
 
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         
-        Container frame	= this.getParent();
+        this.currentFrame = currentFrame;
+        currentFrameInitialTitle = currentFrame.getTitle();        
         JScrollPane left;
         //scrollable list pane
         list = new JList();
@@ -357,7 +361,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 					return "FSP Files";
 					}
 				});
-				int r = chooser.showOpenDialog(frame);
+				int r = chooser.showOpenDialog(currentFrame);
 				if (r == JFileChooser.APPROVE_OPTION) {
 					try {
 						infoText.setText("");
@@ -366,6 +370,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 						File f	= chooser.getSelectedFile();
 						String filename = f.getPath();
 						lastOpenedFile	= filename;
+						currentFrame.setTitle(currentFrameInitialTitle + "[" + f.getName() + "]");						
 						BufferedReader br = new BufferedReader(new FileReader(f)); 
 						while ((s = br.readLine()) != null) { 
 							s2 += s + "\n"; 
@@ -420,11 +425,12 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 						return "FSP Files";
 						}
 					});
-					int r = chooser.showOpenDialog(frame);
+					int r = chooser.showOpenDialog(currentFrame);
 					if (r == JFileChooser.APPROVE_OPTION) {
 						lastOpenedFile = chooser.getSelectedFile().getPath();
 					}else return;
 					File f = new File(lastOpenedFile);
+					currentFrame.setTitle(currentFrameInitialTitle + "[" + f.getName() + "]");
 					FileWriter fw = new FileWriter(f.getAbsoluteFile(), false);
 					editingArea.write(fw);
 					fw.close();
@@ -469,7 +475,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 					return "FSP Files";
 					}
 				});
-				int r = chooser.showOpenDialog(frame);
+				int r = chooser.showOpenDialog(currentFrame);
 				if (r == JFileChooser.APPROVE_OPTION) {
 					compile(chooser.getSelectedFile());
 				}
@@ -492,7 +498,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 					return "REP Files";
 					}
 				});
-				int r = chooser.showOpenDialog(frame);
+				int r = chooser.showOpenDialog(currentFrame);
 				if (r == JFileChooser.APPROVE_OPTION) {
 					try {
 						int fileCount	= chooser.getSelectedFiles().length;

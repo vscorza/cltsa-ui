@@ -67,7 +67,7 @@ public class ExperimentLauncher {
 		frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
 		//frame.setUndecorated(true);
 		frame.setVisible(true);
-		frame.getContentPane().add(new ExperimentJUNGLayoutWindow());
+		frame.getContentPane().add(new ExperimentJUNGLayoutWindow(frame));
 		frame.setVisible(true);
 		URL url = ClassLoader.getSystemResource("ar/uba/dc/lafhis/experiments/logo.png");
 		Toolkit kit = Toolkit.getDefaultToolkit();
