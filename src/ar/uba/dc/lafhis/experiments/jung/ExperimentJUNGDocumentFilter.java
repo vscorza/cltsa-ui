@@ -41,7 +41,7 @@ public class ExperimentJUNGDocumentFilter extends DocumentFilter {
     	this.pane		= pane;
     	styledDocument	= pane.getStyledDocument();
     	keywordPattern 	= buildKeywordPattern();
-    	commentPattern	= Pattern.compile("\\/\\*.*?\\*\\/", Pattern.DOTALL);
+    	commentPattern	= Pattern.compile("^\\/\\*.*?\\*\\/", Pattern.DOTALL | Pattern.MULTILINE);
     	singleLineCommentPattern = Pattern.compile("//.*");
     	enclosurePattern= Pattern.compile("\\||\\{|\\}|\\<|\\>|\\.|\\(|\\)");
     	operatorsPattern= Pattern.compile("-\\>|-|\\<-\\>|\\+|\\*|=|,|\\|\\||\\|f\\||\\|gr1\\||\\[\\]|!|\\bX\\b|&&");    	
