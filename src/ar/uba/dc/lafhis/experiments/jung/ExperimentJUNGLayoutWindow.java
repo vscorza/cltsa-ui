@@ -581,7 +581,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
     private String compile(File f) {
     	editingArea.getHighlighter().removeAllHighlights();
 		String filename = f.getPath();
-		String cmdString	= "../henos-automata/src/cltsa -r " + filename;
+		String cmdString	= "../henos-automata/src/cltsa -r " + filename + " " + filename;
 		String s3 = "Running the following command: <i>" + cmdString + "</i><br>";
 		infoText.setText(s3);
 		compileProgress.setIndeterminate(true);
