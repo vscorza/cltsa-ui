@@ -123,6 +123,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
         editingArea = new JTextPane();
         ((AbstractDocument) editingArea.getDocument()).setDocumentFilter(new ExperimentJUNGDocumentFilter(editingArea));
         editingArea.setBackground(Color.BLACK);
+        editingArea.repaint();
         
         JScrollPane editingPane;
         editingPane = new JScrollPane(editingArea,
@@ -130,10 +131,11 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         editingPane.setPreferredSize(new Dimension(editingPane.getPreferredSize().width, 100));
         editingPane.setBackground(Color.BLACK);
+        editingPane.repaint();
         JPanel editingTop	= new JPanel(new BorderLayout());
         editingTop.add("Center", editingPane);
         editingPanel.setTopComponent(editingTop);
-
+        
         
         painter = new DefaultHighlighter.DefaultHighlightPainter(new Color(100, 55, 0));
 
