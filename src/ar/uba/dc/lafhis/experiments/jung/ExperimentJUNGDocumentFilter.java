@@ -28,7 +28,7 @@ public class ExperimentJUNGDocumentFilter extends DocumentFilter {
     private final SimpleAttributeSet operatorsAttributeSet;
     
 
-    private static String[] KEYWORDS = {"fluent","set","range","const","when","initially","ltl","env","sys","rho","theta","in","order","equals"};
+    private static String[] KEYWORDS = {"fluent","set","range","const","when","initially","ltl","vstate","env","sys","rho","theta","in","order","equals"};
     
     // Use a regular expression to find the words you are looking for
     private Pattern keywordPattern;

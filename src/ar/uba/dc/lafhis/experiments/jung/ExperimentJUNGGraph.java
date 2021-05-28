@@ -160,6 +160,7 @@ public class ExperimentJUNGGraph extends DirectedSparseMultigraph<ExperimentJUNG
 		ReportContext ctx			= automaton.getContext();
 		List<String> fluentNames	= ctx.getfluents();
 		List<String> livenessNames	= ctx.getLivenessNames();
+		List<String> vStatesNames	= ctx.getVStatesNames();
 		//add nodes
 		List<Integer> processedStates	= new ArrayList<Integer>();
 		int i;
@@ -179,6 +180,10 @@ public class ExperimentJUNGGraph extends DirectedSparseMultigraph<ExperimentJUNG
 						if(automaton.getLivenessValuations().size() > (state) && automaton.getLivenessValuations().get(state).size() > (i))
 							currentFluents.add(new ExperimentJUNGGameFluent(livenessNames.get(i), automaton.getLivenessValuations().get(state).get(i)));
 					}
+					for(i = 0; i < vStatesNames.size(); i++) {
+						if(automaton.getVStates().size() > (state) && automaton.getVStates().get(state).size() > (i))
+							currentFluents.add(new ExperimentJUNGGameFluent(vStatesNames.get(i), automaton.getVStates().get(state).get(i)));
+					}					
 					String valuationsString = null;
 					for(ExperimentJUNGGameFluent fluent: currentFluents){
 						
