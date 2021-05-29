@@ -65,7 +65,12 @@ public class ReportAutomaton extends ReportObject{
 				if(current != ReportConstants.AUT_SER_ARRAY_END) {
 					isOK	= false;
 					return;
-				}		
+				}
+				current = (char) fis.read();
+				if(current != ReportConstants.AUT_SER_SEP) {
+					isOK	= false;
+					return;
+				}								
 			}else {
 				localAlphabet	= readIntArray(fis, ReportConstants.AUT_SER_ARRAY_END);
 			}
@@ -80,10 +85,16 @@ public class ReportAutomaton extends ReportObject{
 				if(current != ReportConstants.AUT_SER_ARRAY_END) {
 					isOK	= false;
 					return;
-				}		
+				}
+				current = (char) fis.read();
+				if(current != ReportConstants.AUT_SER_SEP) {
+					isOK	= false;
+					return;
+				}				
 			}else {
 				reportedVStates	= readBooleanArray(fis, ReportConstants.AUT_SER_ARRAY_END);
-			}			
+			}		
+	
 			count		= readInt(fis, ReportConstants.AUT_SER_SEP);
 			if(count == 0) {
 				current 	= (char) fis.read();

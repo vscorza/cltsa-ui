@@ -44,7 +44,7 @@ public class ExperimentJUNGDocumentFilter extends DocumentFilter {
     	commentPattern	= Pattern.compile("^\\/\\*.*?\\*\\/", Pattern.DOTALL | Pattern.MULTILINE);
     	singleLineCommentPattern = Pattern.compile("//.*");
     	enclosurePattern= Pattern.compile("\\||\\{|\\}|\\<|\\>|\\.|\\(|\\)");
-    	operatorsPattern= Pattern.compile("-\\>|-|\\<-\\>|\\+|\\*|=|,|\\|\\||\\|f\\||\\|gr1\\||\\[\\]|!|\\bX\\b|&&");    	
+    	operatorsPattern= Pattern.compile("-\\>|-|\\<-\\>|\\+|\\*|=|,|\\|\\||\\\\|f\\\\||\\\\|s\\\\||\\\\|i\\\\||\\\\|ts\\\\||\\\\|ti\\\\||\\|gr1\\||\\[\\]|!|\\bX\\b|&&");    	
     	
         styleContext = StyleContext.getDefaultStyleContext();
         keywordAttributeSet = new SimpleAttributeSet();
