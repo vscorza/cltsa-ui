@@ -12,7 +12,7 @@ public class ReportSignal extends ReportObject{
 		if(name == null)
 			return "";
 		else
-			return name.replace(".on", "↑").replace(".off","↓"); 
+			return name.replace(".on", "↑").replace(".off","↓").replace("â", ""); 
 	}
 	public ReportSignalType getType() {return type;}
 	//<name,type>
