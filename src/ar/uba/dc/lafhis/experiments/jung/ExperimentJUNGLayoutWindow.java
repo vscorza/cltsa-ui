@@ -202,22 +202,22 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
         editingTop.add("North", searchContainer);
         infoText			= new JTextPane();
         infoText.setContentType("text/html");
-        infoText.setText("Welcome to the <font color='blue'><b>C</b>oncurrent <b>L</b>abelled <b>T</b>ransition <b>S</b>ystem <b>A</b>nalyzer</font>.<br>Feel free to contact me at <a href='mailto:vscorza@gmail.com'>vscorza@gmail.com</a><br><b>[Status pending]</b></html>");
+        infoText.setText("Welcome to the <font color='#5F9EA0'><b>C</b>oncurrent <b>L</b>abelled <b>T</b>ransition <b>S</b>ystem <b>A</b>nalyzer</font>.<br>Feel free to contact me at <font color='#5F9EA0'><a href='mailto:vscorza@gmail.com'>vscorza@gmail.com</a></font><br><b>[Status pending]</b></html>");
         visualizationText	= new JTextPane();
         visualizationText.setContentType("text/html");
         visualizationText.setText(infoText.getText());
-        infoText.setBackground(Color.WHITE);
+        infoText.setBackground(Color.darkGray);
         JScrollPane editorSouthPane = new JScrollPane(infoText, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        editorSouthPane.setPreferredSize(new Dimension(editorSouthPane.getPreferredSize().width, 150));
+        editorSouthPane.setPreferredSize(new Dimension(editorSouthPane.getPreferredSize().width, 200));
         editingPanel.setBottomComponent(editorSouthPane);
-        editingPanel.setDividerLocation(screenSize.height - 150);
-        visualizationText.setBackground(Color.WHITE);
+        editingPanel.setDividerLocation(screenSize.height - 200);
+        visualizationText.setBackground(Color.black);
         JScrollPane visualizationSouthPane = new JScrollPane(visualizationText, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        visualizationSouthPane.setPreferredSize(new Dimension(visualizationSouthPane.getPreferredSize().width, 150));
+        visualizationSouthPane.setPreferredSize(new Dimension(visualizationSouthPane.getPreferredSize().width, 200));
         canvasTools.setBottomComponent(visualizationSouthPane);
-        canvasTools.setDividerLocation(screenSize.height - 150);
+        canvasTools.setDividerLocation(screenSize.height - 200);
         
         tabbedPane = new JTabbedPane();
         
@@ -871,12 +871,14 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
             ReportAutomaton report = ((ReportAutomaton)value);
             String entryType = "" + (report.getIsGame()? "[G]":"") + (report.getIsLTL()? "[L]" : "") + (report.getIsStrategy()? "[S]" : "") 
             		+ (report.getIsDiagnosis()? "[D]" : "");
-            Color backEntryColor = report.getIsStrategy() ? new Color(0,0,153) : (report.getIsDiagnosis()? new Color(204,0,0) :  Color.white);
-            Color backEntrySelectedColor = report.getIsStrategy() ? new Color(0,0,50) : (report.getIsDiagnosis()? new Color(100,0,0) :  Color.black);            
-            Color foreEntryColor = report.getIsStrategy() || report.getIsDiagnosis()? Color.white : Color.black;
+            Color backEntryColor = report.getIsStrategy() ? new Color(0,0,153) : (report.getIsDiagnosis()? new Color(154,0,0) :  Color.black);
+            Color backEntrySelectedColor = report.getIsStrategy() ? new Color(0,0,50) : (report.getIsDiagnosis()? new Color(80,0,0) :  Color.white);            
+            //Color foreEntryColor = report.getIsStrategy() || report.getIsDiagnosis()? Color.black : Color.white;
+            Color foreEntryColor = Color.white;
+            Color foreEntrySelectedColor = report.getIsStrategy() || report.getIsDiagnosis()? Color.white : Color.black;
             setText(report.getName() + entryType + (machineLayout.containsKey(index) ? " (" + machineLayout.get(index) + ")" : ""));
             setBackground(isSelected ? backEntrySelectedColor : backEntryColor);
-            setForeground(isSelected ? Color.white : foreEntryColor);
+            setForeground(isSelected ? foreEntrySelectedColor : foreEntryColor);
             if (machineHasAction != null && machineHasAction[index]) {
                 setBackground(Color.red);
                 setForeground(Color.white);
