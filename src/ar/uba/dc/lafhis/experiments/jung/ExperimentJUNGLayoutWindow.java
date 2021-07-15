@@ -680,13 +680,31 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 				
 				sm[fileCount++]	= new ReportAutomaton(new PushbackInputStream(is));
 			}
+			
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 			return e1.getMessage();
-		}					
+		}	
+		Arrays.sort(sm, new ReportAutomatonComparator());
         new_machines();
         return "";
     }
+    
+    public class ReportAutomatonComparator implements Comparator<ReportAutomaton>{
+    	@Override
+		public int compare(ReportAutomaton left, ReportAutomaton right) {
+			//l < r -> -1, l > r -> 1, l == r -> 0
+			if(right.getIsDiagnosis() && !left.getIsDiagnosis())return -1;
+			if(left.getIsDiagnosis() && !right.getIsDiagnosis())return 1;
+			if(right.getIsStrategy() && !left.getIsStrategy())return -1;
+			if(left.getIsStrategy() && !right.getIsStrategy())return 1;
+			if(right.getIsGame() && !left.getIsGame())return -1;
+			if(left.getIsGame() && !right.getIsGame())return 1;
+			if(right.getIsLTL() && !left.getIsLTL())return -1;
+			if(left.getIsLTL() && !right.getIsLTL())return 1;    		   
+			return left.getName().compareTo(right.getName());
+    	}
+    }    
     
     private ImageIcon getDrawIcon() {
     	return null;
@@ -795,14 +813,19 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
         public Component getListCellRendererComponent(
                 JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             setFont(fontFlag ? f4 : f3);
-            setText(value + (machineLayout.containsKey(index) ? " (" + machineLayout.get(index) + ")" : ""));
-            setBackground(isSelected ? Color.blue : Color.white);
-            setForeground(isSelected ? Color.white : Color.black);
+            ReportAutomaton report = ((ReportAutomaton)value);
+            String entryType = "" + (report.getIsGame()? "[G]":"") + (report.getIsLTL()? "[L]" : "") + (report.getIsStrategy()? "[S]" : "") 
+            		+ (report.getIsDiagnosis()? "[D]" : "");
+            Color backEntryColor = report.getIsStrategy() ? new Color(0,0,153) : (report.getIsDiagnosis()? new Color(204,0,0) :  Color.white);
+            Color backEntrySelectedColor = report.getIsStrategy() ? new Color(0,0,50) : (report.getIsDiagnosis()? new Color(100,0,0) :  Color.black);            
+            Color foreEntryColor = report.getIsStrategy() || report.getIsDiagnosis()? Color.white : Color.black;
+            setText(report.getName() + entryType + (machineLayout.containsKey(index) ? " (" + machineLayout.get(index) + ")" : ""));
+            setBackground(isSelected ? backEntrySelectedColor : backEntryColor);
+            setForeground(isSelected ? Color.white : foreEntryColor);
             if (machineHasAction != null && machineHasAction[index]) {
                 setBackground(Color.red);
                 setForeground(Color.white);
             }
-            setForeground(isSelected ? Color.white : Color.black);
             setIcon(machineToDrawSet[index] && !singleMode ? drawIcon : null);
             return this;
         }
@@ -925,12 +948,9 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 		
 		graphs = new ExperimentJUNGGraph[Nmach];
 
-        DefaultListModel<String> lm = new DefaultListModel<String>();
+        DefaultListModel<ReportAutomaton> lm = new DefaultListModel<ReportAutomaton>();
         for (int i = 0; i < Nmach; i++) {
-            if (hasC == 1 && i == (Nmach - 1))
-                lm.addElement("||" + sm[i].getName());
-            else
-                lm.addElement(sm[i].getName());
+        	lm.addElement(sm[i]);
         }
         list.setModel(lm);
 

@@ -7,6 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReportAutomaton extends ReportObject{
+	public static int SOURCE_GAME	= 0x1;
+	public static int SOURCE_LTL	= 0x2;
+	public static int SOURCE_STRAT	= 0x4;
+	public static int SOURCE_DIAG	= 0x8;
+	
 	protected String name;
 	protected ReportContext context;
 	protected List<Integer> localAlphabet;
@@ -16,6 +21,10 @@ public class ReportAutomaton extends ReportObject{
 	protected List<List<Boolean>> livenessValuations;
 	protected List<Boolean> reportedVStates;
 	protected List<List<Boolean>> vStates;
+	protected boolean isGame;
+	protected boolean isLtl;
+	protected boolean isStrat;
+	protected boolean isDiag;
 	
 	public String getName() {return name;}
 	public ReportContext getContext() {return context;}
@@ -26,6 +35,10 @@ public class ReportAutomaton extends ReportObject{
 	public List<List<Boolean>> getLivenessValuations(){return livenessValuations;}
 	public List<Boolean> getReportedVStates(){return reportedVStates;}
 	public List<List<Boolean>> getVStates(){return vStates;}
+	public boolean getIsGame() {return isGame; }
+	public boolean getIsLTL() {return isLtl; }
+	public boolean getIsStrategy() { return isStrat; }
+	public boolean getIsDiagnosis() { return isDiag; }
 	/*
 	 * <name,ctx,local_alphabet_count,[sig_1.idx,..,sig_N.idx],vstates_monitored_count,[vstates_mon1,..,vstates_monN]
 	,trans_count,[trans_1,..,trans_M],init_count,[init_i,..,init_K],[[val_s_0_f_0,..,val_s_0_f_L],..,[val_s_T_f_0,..,val_s_T_f_L]]
@@ -48,6 +61,11 @@ public class ReportAutomaton extends ReportObject{
 				return;
 			}
 			name			= readString(fis, ReportConstants.AUT_SER_SEP);
+			int source		= readInt(fis, ReportConstants.AUT_SER_SEP);
+			isGame			= (source & ReportAutomaton.SOURCE_GAME) == ReportAutomaton.SOURCE_GAME;
+			isLtl			= (source & ReportAutomaton.SOURCE_LTL) == ReportAutomaton.SOURCE_LTL;
+			isStrat			= (source & ReportAutomaton.SOURCE_STRAT) == ReportAutomaton.SOURCE_STRAT;
+			isDiag			= (source & ReportAutomaton.SOURCE_DIAG) == ReportAutomaton.SOURCE_DIAG;
 			context			= new ReportContext(fis);
 			current = (char) fis.read();
 			if(current != ReportConstants.AUT_SER_SEP) {
