@@ -8,6 +8,7 @@ public class ExperimentJUNGStateVertex {
 	private String graphName;
 	private int stateIndex;
 	private String stateValue;
+	private boolean isInitial;
 	
 	public int getStateIndex() {
 		return stateIndex;
@@ -21,7 +22,12 @@ public class ExperimentJUNGStateVertex {
 		return graphName;
 	}
 	
-	public ExperimentJUNGStateVertex(int index, String value, String graph) {
+	public boolean getInitial() {
+		return isInitial;
+	}
+	
+	public ExperimentJUNGStateVertex(boolean initial, int index, String value, String graph) {
+		isInitial	= initial;
 		stateIndex 	= index;
 		stateValue	= value;
 		graphName 	= graph;

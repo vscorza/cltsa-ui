@@ -78,7 +78,7 @@ public class ReportContext extends ReportObject {
 					return;
 				}
 			}else {
-				livenessNames	= readStringArray(fis, ReportConstants.AUT_SER_OBJ_END);
+				livenessNames	= readStringArray(fis, ReportConstants.AUT_SER_SEP);
 			}		
 			count		= readInt(fis, ReportConstants.AUT_SER_SEP);
 			if(count == 0) {

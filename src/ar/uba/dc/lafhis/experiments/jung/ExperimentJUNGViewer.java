@@ -419,7 +419,7 @@ public class ExperimentJUNGViewer extends VisualizationViewer<ExperimentJUNGStat
                 super();
             }
         	public Paint transform(ExperimentJUNGStateVertex v) {
-        		return navigator.getCurrent().contains(v) ?
+        		return v.getInitial()? Color.RED : navigator.getCurrent().contains(v) ?
         					NavigationColors.Vertex.current
         				:
         					navigator.getNext().contains(v) ?
@@ -478,7 +478,7 @@ public class ExperimentJUNGViewer extends VisualizationViewer<ExperimentJUNGStat
         	public Paint transform(ExperimentJUNGStateVertex v)
 			{
         		Color color;
-        		return  p.isPicked(v) ? EditColors.Vertex.picked
+        		return  v.getInitial()? Color.RED : p.isPicked(v) ? EditColors.Vertex.picked
         				: ((canvas.shouldColorSCC() && (color = isInSCC(v)) != null) ? color
         					: canvas.getSelectedVertices().contains(v) ? EditColors.Vertex.animated
         						: (v.toString().equals("0") && canvas.getSelectedVertices().size() == 0 ? EditColors.Vertex.animated

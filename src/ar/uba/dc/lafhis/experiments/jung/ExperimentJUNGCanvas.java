@@ -496,14 +496,9 @@ public class ExperimentJUNGCanvas extends JPanel {
 		HashSet<String> graphNames = new HashSet<String>();
 		HashSet<String> statesValues = new HashSet<String>();
 
-		boolean isFirstState	= true;
-		int firstState			= -1;
+		int firstState			= g.getInitialState();
 		
 		for (ExperimentJUNGStateVertex j : g.getVertices()) {
-			if(isFirstState) {
-				isFirstState	 = false;
-				firstState		= j.getStateIndex();
-			}
 			graphNames.add(j.getGraphName());
 			statesValues.add(j.getStateValue());
 		}
@@ -522,7 +517,7 @@ public class ExperimentJUNGCanvas extends JPanel {
 			}
 			value += v;
 		}
-		return new ExperimentJUNGStateVertex(firstState, value,name.trim());
+		return new ExperimentJUNGStateVertex(true, firstState, value,name.trim());
 	}
     
 	/*

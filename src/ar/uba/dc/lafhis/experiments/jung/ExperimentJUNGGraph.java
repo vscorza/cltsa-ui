@@ -31,6 +31,7 @@ public class ExperimentJUNGGraph extends DirectedSparseMultigraph<ExperimentJUNG
 	private boolean mixed; //a graph is mixed when it holds multiple single graphs besides itself
 	private Set<ExperimentJUNGGraph> innerGraphs;
 	private Map<ExperimentJUNGGraph,List<Set<ExperimentJUNGStateVertex>>> SCCs;
+	private int initialState;
 	
 	public class ExperimentJUNGNavigator {
 		private Set<ExperimentJUNGStateVertex> reached;
@@ -133,6 +134,10 @@ public class ExperimentJUNGGraph extends DirectedSparseMultigraph<ExperimentJUNG
 		return new ExperimentJUNGNavigator(vs);
 	}
 	
+	public int getInitialState() {
+		return initialState;
+	}
+	
 	public ExperimentJUNGGraph() {
 		this("aggregate");
 	}
@@ -150,6 +155,7 @@ public class ExperimentJUNGGraph extends DirectedSparseMultigraph<ExperimentJUNG
 		this(automaton.getName());
 		mixed = false;
 		
+		initialState	= automaton.getInitialStates().get(0);
 		
 		ExperimentJUNGStateVertex currentNode				= null;
 		ExperimentJUNGTransitionEdge currentEdge			= null;
@@ -196,7 +202,7 @@ public class ExperimentJUNGGraph extends DirectedSparseMultigraph<ExperimentJUNG
 					else
 						valuationsString = "";
 					
-					currentNode 	= new ExperimentJUNGStateVertex(state, valuationsString
+					currentNode 	= new ExperimentJUNGStateVertex(state == initialState, state, valuationsString
 							, automaton.getName());
 					
 					addVertex(currentNode);
