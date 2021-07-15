@@ -9,12 +9,14 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 
 import ar.uba.dc.lafhis.experiments.jung.ExperimentJUNGCanvas.EnumLayout;
@@ -87,6 +89,7 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
     JTextField replaceField;
     JCheckBox caseSensitiveCheckBox;
     JTextPane editingArea;
+    JScrollPane editingPane;
     JProgressBar compileProgress;
     Highlighter.HighlightPainter painter;
     
@@ -95,6 +98,29 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
     public ExperimentJUNGLayoutWindow(JFrame currentFrame) {
 
         super();
+        
+    	try {
+    	    UIManager.setLookAndFeel(new NimbusLookAndFeel());
+    	    UIManager.put("control", new Color(128, 128, 128));
+    	    UIManager.put("info", new Color(128, 128, 128));
+    	    UIManager.put("nimbusBase", new Color(18, 30, 49));
+    	    UIManager.put("nimbusAlertYellow", new Color(248, 187, 0));
+    	    UIManager.put("nimbusDisabledText", new Color(128, 128, 128));
+    	    UIManager.put("nimbusFocus", new Color(115, 164, 209));
+    	    UIManager.put("nimbusGreen", new Color(176, 179, 50));
+    	    UIManager.put("nimbusInfoBlue", new Color(66, 139, 221));
+    	    //UIManager.put("nimbusLightBackground", new Color(18, 30, 49));
+    	    UIManager.put("nimbusLightBackground", new Color(0, 0, 0));
+    	    UIManager.put("nimbusOrange", new Color(191, 98, 4));
+    	    UIManager.put("nimbusRed", new Color(169, 46, 34));
+    	    UIManager.put("nimbusSelectedText", new Color(255, 255, 255));
+    	    UIManager.put("nimbusSelectionBackground", new Color(104, 93, 156));
+    	    UIManager.put("text", new Color(230, 230, 230));
+    	    SwingUtilities.updateComponentTreeUI(this);
+    	} catch (UnsupportedLookAndFeelException exc) {
+    	    System.err.println("Nimbus: Unsupported Look and feel!");
+    	}        
+        
         drawIcon = getDrawIcon();
 
 
@@ -122,16 +148,15 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
         
         editingArea = new JTextPane();
         ((AbstractDocument) editingArea.getDocument()).setDocumentFilter(new ExperimentJUNGDocumentFilter(editingArea));
-        editingArea.setBackground(Color.BLACK);
-        editingArea.repaint();
         
-        JScrollPane editingPane;
+        
+
         editingPane = new JScrollPane(editingArea,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         editingPane.setPreferredSize(new Dimension(editingPane.getPreferredSize().width, 100));
         editingPane.setBackground(Color.BLACK);
-        editingPane.repaint();
+        editingPane.invalidate();
         JPanel editingTop	= new JPanel(new BorderLayout());
         editingTop.add("Center", editingPane);
         editingPanel.setTopComponent(editingTop);
@@ -384,7 +409,12 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 						infoText.setText(e1.getMessage());
 					}					
 				}
+		        editingArea.setBackground(Color.BLACK);
+		        editingArea.invalidate();
+		        editingPane.setBackground(Color.BLACK);
+		        editingPane.invalidate();
 			}
+			
 
 		});
         innerLeftPanel.add(openButton, gbc);  
@@ -403,7 +433,11 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 				} catch (IOException e1) {
 					e1.printStackTrace();
 					infoText.setText(e1.getMessage());
-				}									
+				}		
+		        editingArea.setBackground(Color.BLACK);
+		        editingArea.repaint();
+		        editingPane.setBackground(Color.BLACK);
+		        editingPane.repaint();
 			}
 
 		});
@@ -439,7 +473,11 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 				} catch (IOException e1) {
 					e1.printStackTrace();
 					infoText.setText(e1.getMessage());
-				}									
+				}				
+		        editingArea.setBackground(Color.BLACK);
+		        editingArea.repaint();
+		        editingPane.setBackground(Color.BLACK);
+		        editingPane.repaint();
 			}
 
 		});
@@ -548,8 +586,12 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
         setRightComponent(mainPanel);
         setDividerLocation(200);
         setBigFont(fontFlag);
+        
         validate();
-
+        editingArea.setBackground(Color.BLACK);
+        editingArea.repaint();
+        editingPane.setBackground(Color.BLACK);
+        editingPane.repaint();
     }
 
     private void searchReplace(boolean isSearch, boolean isAll) {
@@ -578,10 +620,15 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 	            }
 	        }
     	}
+        editingArea.setBackground(Color.BLACK);
+        editingArea.repaint();
+        editingPane.setBackground(Color.BLACK);
+        editingPane.repaint();
     }
     
     private String compile(File f) {
     	editingArea.getHighlighter().removeAllHighlights();
+
 		String filename = f.getPath();
 		String cmdString	= "../henos-automata/src/cltsa -r " + filename + " " + filename;
 		String s3 = "Running the following command: <i>" + cmdString + "</i><br>";
@@ -655,6 +702,10 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 		    	for(JButton b: activeButtons)b.setEnabled(true);
 			}
 		};
+        editingArea.setBackground(Color.BLACK);
+        editingArea.repaint();
+        editingPane.setBackground(Color.BLACK);
+        editingPane.repaint();
 		cmdThread.setDaemon(true);
 		cmdThread.start();
 	    return "";
@@ -687,6 +738,10 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 		}	
 		Arrays.sort(sm, new ReportAutomatonComparator());
         new_machines();
+        editingArea.setBackground(Color.BLACK);
+        editingArea.invalidate();        
+        editingPane.setBackground(Color.BLACK);
+        editingPane.invalidate();
         return "";
     }
     
