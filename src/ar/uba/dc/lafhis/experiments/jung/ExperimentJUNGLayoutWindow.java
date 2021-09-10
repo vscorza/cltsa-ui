@@ -728,12 +728,16 @@ public class ExperimentJUNGLayoutWindow extends JSplitPane{
 			for(File f2: fileList) {
 				FileInputStream is;
 					is = new FileInputStream(f2.getPath());
-				
-				sm[fileCount++]	= new ReportAutomaton(new PushbackInputStream(is));
+				try {
+					sm[fileCount++]	= new ReportAutomaton(new PushbackInputStream(is));
+				}catch(Exception e) {
+					return e.getMessage() + "<br><b>" + f2.getPath() + "</b> Yielded an empty automaton.";
+				}
 			}
 			
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
+			infoText.setText(infoText.getText() + "<br>" + e1.getMessage());
 			return e1.getMessage();
 		}	
 		Arrays.sort(sm, new ReportAutomatonComparator());
